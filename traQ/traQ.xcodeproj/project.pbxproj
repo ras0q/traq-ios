@@ -7,7 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		4F6D40922CDE39F5003DF896 /* Feature in Frameworks */ = {isa = PBXBuildFile; productRef = 4F6D40912CDE39F5003DF896 /* Feature */; };
+		4F6D40C12CDE3D49003DF896 /* Views in Frameworks */ = {isa = PBXBuildFile; productRef = 4F6D40C02CDE3D49003DF896 /* Views */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -56,7 +56,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				4F6D40922CDE39F5003DF896 /* Feature in Frameworks */,
+				4F6D40C12CDE3D49003DF896 /* Views in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -125,7 +125,7 @@
 			);
 			name = traQ;
 			packageProductDependencies = (
-				4F6D40912CDE39F5003DF896 /* Feature */,
+				4F6D40C02CDE3D49003DF896 /* Views */,
 			);
 			productName = traQ;
 			productReference = 4F6D40162CDE360C003DF896 /* traQ.app */;
@@ -574,9 +574,9 @@
 /* End XCConfigurationList section */
 
 /* Begin XCSwiftPackageProductDependency section */
-		4F6D40912CDE39F5003DF896 /* Feature */ = {
+		4F6D40C02CDE3D49003DF896 /* Views */ = {
 			isa = XCSwiftPackageProductDependency;
-			productName = Feature;
+			productName = Views;
 		};
 /* End XCSwiftPackageProductDependency section */
 	};
