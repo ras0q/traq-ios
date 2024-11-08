@@ -1,10 +1,22 @@
+import ChannelTreeFeature
+import SessionFeature
 import SwiftUI
 
 public struct MainView: View {
     public init() {}
 
     public var body: some View {
-        Text("Hello traQ!")
+        SessionView(
+            store: .init(initialState: Session.State()) {
+                Session()
+            }
+        ) {
+            ChannelTreeView(
+                store: .init(initialState: ChannelTree.State()) {
+                    ChannelTree()
+                }
+            )
+        }
     }
 }
 
