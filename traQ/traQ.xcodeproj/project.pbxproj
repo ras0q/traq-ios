@@ -6,6 +6,10 @@
 	objectVersion = 77;
 	objects = {
 
+/* Begin PBXBuildFile section */
+		4F6D40922CDE39F5003DF896 /* Feature in Frameworks */ = {isa = PBXBuildFile; productRef = 4F6D40912CDE39F5003DF896 /* Feature */; };
+/* End PBXBuildFile section */
+
 /* Begin PBXContainerItemProxy section */
 		4F6D40292CDE360D003DF896 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
@@ -30,9 +34,9 @@
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
-		4F6D40182CDE360C003DF896 /* traQ */ = {
+		4F6D40182CDE360C003DF896 /* iOS */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
-			path = traQ;
+			path = iOS;
 			sourceTree = "<group>";
 		};
 		4F6D402B2CDE360D003DF896 /* traQTests */ = {
@@ -52,6 +56,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				4F6D40922CDE39F5003DF896 /* Feature in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -75,9 +80,10 @@
 		4F6D400D2CDE360C003DF896 = {
 			isa = PBXGroup;
 			children = (
-				4F6D40182CDE360C003DF896 /* traQ */,
+				4F6D40182CDE360C003DF896 /* iOS */,
 				4F6D402B2CDE360D003DF896 /* traQTests */,
 				4F6D40352CDE360D003DF896 /* traQUITests */,
+				4F6D40902CDE39F5003DF896 /* Frameworks */,
 				4F6D40172CDE360C003DF896 /* Products */,
 			);
 			sourceTree = "<group>";
@@ -90,6 +96,13 @@
 				4F6D40322CDE360D003DF896 /* traQUITests.xctest */,
 			);
 			name = Products;
+			sourceTree = "<group>";
+		};
+		4F6D40902CDE39F5003DF896 /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			name = Frameworks;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -108,10 +121,11 @@
 			dependencies = (
 			);
 			fileSystemSynchronizedGroups = (
-				4F6D40182CDE360C003DF896 /* traQ */,
+				4F6D40182CDE360C003DF896 /* iOS */,
 			);
 			name = traQ;
 			packageProductDependencies = (
+				4F6D40912CDE39F5003DF896 /* Feature */,
 			);
 			productName = traQ;
 			productReference = 4F6D40162CDE360C003DF896 /* traQ.app */;
@@ -395,7 +409,7 @@
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_ASSET_PATHS = "\"traQ/Preview Content\"";
+				DEVELOPMENT_ASSET_PATHS = "\"iOS/Preview Content\"";
 				DEVELOPMENT_TEAM = CQY36HA9Y2;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
@@ -424,7 +438,7 @@
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_ASSET_PATHS = "\"traQ/Preview Content\"";
+				DEVELOPMENT_ASSET_PATHS = "\"iOS/Preview Content\"";
 				DEVELOPMENT_TEAM = CQY36HA9Y2;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
@@ -558,6 +572,13 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		4F6D40912CDE39F5003DF896 /* Feature */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = Feature;
+		};
+/* End XCSwiftPackageProductDependency section */
 	};
 	rootObject = 4F6D400E2CDE360C003DF896 /* Project object */;
 }
