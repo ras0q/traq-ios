@@ -8,14 +8,18 @@ package struct ChannelTreeNode: Reducer {
         let channel: Components.Schemas.Channel
     }
 
-    package enum Action: Equatable {
-        case onTapped
+    package enum Action {
+        case view(ViewAction)
+
+        package enum ViewAction {
+            case onTapped
+        }
     }
 
     package var body: some ReducerOf<Self> {
         Reduce { state, action in
             switch action {
-            case .onTapped:
+            case .view(.onTapped):
                 return .none
             }
         }
@@ -41,7 +45,7 @@ struct ChannelTreeNodeView: View {
                 }
                 .contentShape(Rectangle()) // Spacerにも判定をつける
                 .onTapGesture {
-                    viewStore.send(.onTapped)
+                    viewStore.send(.view(.onTapped))
                 }
             }
         }

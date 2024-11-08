@@ -3,8 +3,8 @@ import SwiftUI
 import TraqAPI
 
 package struct ChannelTree: Reducer {
-    struct ChannelRecursive: Identifiable, Equatable {
-        var id: String { base.id }
+    package struct ChannelRecursive: Identifiable, Equatable {
+        package var id: String { base.id }
         let base: Components.Schemas.Channel
         let children: [ChannelRecursive]?
 
@@ -27,16 +27,24 @@ package struct ChannelTree: Reducer {
     }
 
     package struct State: Equatable {
-        var channels: [ChannelRecursive] = []
+        var rootChannels: [ChannelRecursive] = []
         var isLoading: Bool = false
-        var error: String?
 
         package init() {}
     }
 
-    package enum Action: Equatable {
-        case onAppear
-        case fetchChannelsResponse(TaskResult<[Components.Schemas.Channel]>)
+    package enum Action {
+        case view(ViewAction)
+        case `internal`(InternalAction)
+
+        package enum ViewAction {
+            case onAppear
+        }
+
+        package enum InternalAction {
+            case getChannelsResponse(Operations.getChannels.Output)
+            case channelTreeConstructed([ChannelRecursive])
+        }
     }
 
     package init() {}
@@ -44,21 +52,31 @@ package struct ChannelTree: Reducer {
     package var body: some ReducerOf<Self> {
         Reduce { state, action in
             switch action {
-            case .onAppear:
-                state.isLoading = true
-                return .run { send in
-                    await send(.fetchChannelsResponse(TaskResult {
-                        try await traqAPIClient.getChannels(query: .init(include_hyphen_dm: false)).ok.body.json._public
-                    }))
+            case let .view(viewAction):
+                switch viewAction {
+                case .onAppear:
+                    state.isLoading = true
+                    return .run { send in
+                        let response = try await traqAPIClient.getChannels(query: .init(include_hyphen_dm: false))
+                        await send(.internal(.getChannelsResponse(response)))
+                    }
                 }
-            case let .fetchChannelsResponse(result):
-                state.isLoading = false
-                switch result {
-                case let .success(response):
-                    state.channels = ChannelRecursive(channels: response)?.children ?? []
-                case let .failure(error):
-                    print(error.localizedDescription)
-                    state.error = error.localizedDescription
+            case let .internal(internalAction):
+                switch internalAction {
+                case let .getChannelsResponse(response):
+                    state.isLoading = false
+                    switch response {
+                    case let .ok(ok):
+                        return .run { send in
+                            let publicChannels = try ok.body.json._public
+                            let rootChannels = ChannelRecursive(channels: publicChannels)?.children ?? []
+                            await send(.internal(.channelTreeConstructed(rootChannels)))
+                        }
+                    default:
+                        print(response)
+                    }
+                case let .channelTreeConstructed(rootChannels):
+                    state.rootChannels = rootChannels
                 }
                 return .none
             }
@@ -75,12 +93,8 @@ package struct ChannelTreeView: View {
 
     package var body: some View {
         WithViewStore(store, observe: { $0 }) { viewStore in
-            if let error = viewStore.error {
-                Text(error)
-            }
-
             Group {
-                List(viewStore.channels, id: \.id, children: \.children) {
+                List(viewStore.rootChannels, id: \.id, children: \.children) {
                     ChannelTreeNodeView(
                         store: .init(
                             initialState: ChannelTreeNode.State(channel: $0.base)
@@ -91,7 +105,7 @@ package struct ChannelTreeView: View {
                 }
             }
             .onAppear {
-                viewStore.send(.onAppear)
+                viewStore.send(.view(.onAppear))
             }
         }
     }
