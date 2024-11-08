@@ -39,16 +39,6 @@
 			path = iOS;
 			sourceTree = "<group>";
 		};
-		4F6D402B2CDE360D003DF896 /* traQTests */ = {
-			isa = PBXFileSystemSynchronizedRootGroup;
-			path = traQTests;
-			sourceTree = "<group>";
-		};
-		4F6D40352CDE360D003DF896 /* traQUITests */ = {
-			isa = PBXFileSystemSynchronizedRootGroup;
-			path = traQUITests;
-			sourceTree = "<group>";
-		};
 /* End PBXFileSystemSynchronizedRootGroup section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -81,9 +71,6 @@
 			isa = PBXGroup;
 			children = (
 				4F6D40182CDE360C003DF896 /* iOS */,
-				4F6D402B2CDE360D003DF896 /* traQTests */,
-				4F6D40352CDE360D003DF896 /* traQUITests */,
-				4F6D40902CDE39F5003DF896 /* Frameworks */,
 				4F6D40172CDE360C003DF896 /* Products */,
 			);
 			sourceTree = "<group>";
@@ -96,13 +83,6 @@
 				4F6D40322CDE360D003DF896 /* traQUITests.xctest */,
 			);
 			name = Products;
-			sourceTree = "<group>";
-		};
-		4F6D40902CDE39F5003DF896 /* Frameworks */ = {
-			isa = PBXGroup;
-			children = (
-			);
-			name = Frameworks;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -144,9 +124,6 @@
 			dependencies = (
 				4F6D402A2CDE360D003DF896 /* PBXTargetDependency */,
 			);
-			fileSystemSynchronizedGroups = (
-				4F6D402B2CDE360D003DF896 /* traQTests */,
-			);
 			name = traQTests;
 			packageProductDependencies = (
 			);
@@ -166,9 +143,6 @@
 			);
 			dependencies = (
 				4F6D40342CDE360D003DF896 /* PBXTargetDependency */,
-			);
-			fileSystemSynchronizedGroups = (
-				4F6D40352CDE360D003DF896 /* traQUITests */,
 			);
 			name = traQUITests;
 			packageProductDependencies = (
