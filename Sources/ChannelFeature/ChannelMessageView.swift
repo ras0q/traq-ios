@@ -13,8 +13,8 @@ struct ChannelMessageView: View {
                 .frame(width: 40, height: 40, alignment: .leading)
             VStack (alignment: .leading) {
                 HStack {
-                    Text(user.displayName)
-                    Text("@\(user.name)").foregroundStyle(Color.gray)
+                    Text(user.displayName).bold()
+                    Text("@\(user.name)").font(.callout).foregroundStyle(Color.gray)
                 }
                 Markdown("\(message.content)", stamps: [])
             }
