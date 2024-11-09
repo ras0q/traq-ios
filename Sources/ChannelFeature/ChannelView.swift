@@ -8,6 +8,7 @@ package struct Channel {
     @ObservableState
     package struct State: Equatable {
         let channel: Components.Schemas.Channel
+        let channelPath: String
         var messages: [Components.Schemas.Message] = []
         @Shared(.inMemory("users"))
         package var users: [Components.Schemas.User] = []
@@ -16,8 +17,9 @@ package struct Channel {
         @Shared(.inMemory("clipFolderId"))
         package var clipFolderId: String? = nil
 
-        package init(channel: Components.Schemas.Channel) {
+        package init(channel: Components.Schemas.Channel, channelPath: String) {
             self.channel = channel
+            self.channelPath = channelPath
         }
     }
 
@@ -118,7 +120,7 @@ package struct ChannelView: View {
     package var body: some View {
         WithViewStore(store, observe: { $0 }) { viewStore in
             VStack(alignment: .leading) {
-                Text("#\(viewStore.channel.name)")
+                Text(viewStore.channelPath.replacing("/", maxReplacements: 1, with: { _ in "#" }))
                     .font(.title)
                     .bold()
                 List(viewStore.messages, id: \.id) { message in

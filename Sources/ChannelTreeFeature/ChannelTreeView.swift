@@ -8,23 +8,31 @@ package struct ChannelTree {
     package struct ChannelRecursive: Identifiable, Equatable {
         package var id: String { base.id }
         let base: Components.Schemas.Channel
+        let path: String
         let children: [ChannelRecursive]?
 
-        init(base: Components.Schemas.Channel, children: [ChannelRecursive]?) {
+        init(base: Components.Schemas.Channel, path: String, children: [ChannelRecursive]?) {
             self.base = base
+            self.path = path
             self.children = children
         }
 
         init?(channels: [Components.Schemas.Channel], rootId: String? = nil) {
-            func getDescendants(parentId: String?) -> [ChannelRecursive]? {
+            func getDescendants(parentId: String?, parentpath: String) -> [ChannelRecursive]? {
                 let children = channels.filter { $0.parentId == parentId }
                 return children.map {
-                    ChannelRecursive(base: $0, children: getDescendants(parentId: $0.id))
+                    let path = "\(parentpath)/\($0.name)"
+                    return ChannelRecursive(
+                        base: $0,
+                        path: path,
+                        children: getDescendants(parentId: $0.id, parentpath: path)
+                    )
                 }
             }
 
             base = channels.first { $0.id == rootId } ?? .mock(0)
-            children = getDescendants(parentId: rootId)
+            path = ""
+            children = getDescendants(parentId: rootId, parentpath: "")
         }
     }
 
@@ -44,7 +52,7 @@ package struct ChannelTree {
 
         package enum ViewAction {
             case appeared
-            case nodeTapped(channel: Components.Schemas.Channel)
+            case nodeTapped(channel: Components.Schemas.Channel, channelPath: String)
             case nodeDismissed
         }
 
@@ -67,8 +75,8 @@ package struct ChannelTree {
                         let response = try await traqAPIClient.getChannels(query: .init(include_hyphen_dm: false))
                         await send(.internal(.getChannelsResponse(response)))
                     }
-                case let .nodeTapped(channel: channel):
-                    state.destination = Channel.State(channel: channel)
+                case let .nodeTapped(channel: channel, channelPath: channelPath):
+                    state.destination = Channel.State(channel: channel, channelPath: channelPath)
                 case .nodeDismissed:
                     state.destination = nil
                 }
@@ -118,7 +126,7 @@ package struct ChannelTreeView: View {
                 name: channel.base.name,
                 hasChildren: channel.base.children.count > 0,
                 onNodeTapped: {
-                    viewStore.send(.view(.nodeTapped(channel: channel.base)))
+                    viewStore.send(.view(.nodeTapped(channel: channel.base, channelPath: channel.path)))
                 }
             )
         }
