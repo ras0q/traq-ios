@@ -30,11 +30,14 @@ package struct ChannelTree {
 
     @ObservableState
     package struct State: Equatable {
+        let users: [Components.Schemas.User]
         var rootChannels: [ChannelRecursive] = []
         var isLoading: Bool = false
         @Presents var destination: Channel.State?
 
-        package init() {}
+        package init(users: [Components.Schemas.User]) {
+            self.users = users
+        }
     }
 
     package enum Action {
@@ -68,7 +71,7 @@ package struct ChannelTree {
                         await send(.internal(.getChannelsResponse(response)))
                     }
                 case let .nodeTapped(channel: channel):
-                    state.destination = Channel.State(channel: channel)
+                    state.destination = Channel.State(channel: channel, users: state.users)
                 case .nodeDismissed:
                     state.destination = nil
                 }
@@ -152,7 +155,7 @@ package struct ChannelTreeView: View {
 
 #Preview {
     ChannelTreeView(
-        store: .init(initialState: ChannelTree.State()) {
+        store: .init(initialState: ChannelTree.State(users: [])) {
             ChannelTree()
                 ._printChanges()
         }

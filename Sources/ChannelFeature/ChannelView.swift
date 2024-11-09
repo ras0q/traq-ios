@@ -3,13 +3,17 @@ import MarkdownFeature
 import SwiftUI
 import TraqAPI
 
-package struct Channel: Reducer {
+@Reducer
+package struct Channel {
+    @ObservableState
     package struct State: Equatable {
         let channel: Components.Schemas.Channel
+        let users: [Components.Schemas.User]
         var messages: [Components.Schemas.Message] = []
 
-        package init(channel: Components.Schemas.Channel) {
+        package init(channel: Components.Schemas.Channel, users: [Components.Schemas.User]) {
             self.channel = channel
+            self.users = users
         }
     }
 
@@ -77,11 +81,10 @@ package struct ChannelView: View {
                     .font(.title)
                     .bold()
                 List(viewStore.messages, id: \.id) { message in
-                    VStack (alignment: .leading) {
-                        Text("@\(message.userId.prefix(10))") // TODO: use username
-                            .bold()
-                        Markdown("\(message.content)", stamps: [])
-                    }
+                    ChannelMessageView(
+                        message: message,
+                        user: viewStore.users.first(where: { $0.id == message.userId })!
+                    )
                 }
                 .listStyle(.inset)
                 Spacer()

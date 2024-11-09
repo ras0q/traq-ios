@@ -3,8 +3,11 @@ import SwiftUI
 import TraqAPI
 
 package struct Session: Reducer {
+    @ObservableState
     package struct State: Equatable {
-        var isLogined: Bool
+        var isLogined: Bool = false
+        // TODO: should users be shared?
+        package var users: [Components.Schemas.User] = []
 
         package init(isLogined: Bool = false) {
             self.isLogined = isLogined
@@ -21,7 +24,8 @@ package struct Session: Reducer {
         }
 
         package enum InternalAction {
-            case getMeResponse(Operations.getMe.Output)
+//            case getMeResponse(Operations.getMe.Output)
+            case getUsersResponse(Operations.getUsers.Output)
             case loginResponse(Operations.login.Output)
         }
     }
@@ -34,10 +38,19 @@ package struct Session: Reducer {
             case let .view(viewAction):
                 switch viewAction {
                 case .onAppear:
-                    return .run { send in
-                        let response = try await traqAPIClient.getMe()
-                        await send(.internal(.getMeResponse(response)))
-                    }
+                    // FIXME: 複数のリクエストを同時に投げると画面が描画されないので今はgetUsersでログイン確認を行っている。SessionViewの表示時にさらにリクエストが増えるとこれを解決しなければならない。
+                    return .merge(
+//                        .run { send in
+//                            let getMeResponse = try await traqAPIClient.getMe()
+//                            await send(.internal(.getMeResponse(getMeResponse)))
+//                        },
+                        .run { send in
+                            let getUsersResponse = try await traqAPIClient.getUsers(
+                                .init(query: .init(include_hyphen_suspended: true))
+                            )
+                            await send(.internal(.getUsersResponse(getUsersResponse)))
+                        }
+                    )
                 case let .loginButtonTapped(name: name, password: password):
                     return .run { send in
                         let response = try await traqAPIClient.login(
@@ -48,10 +61,23 @@ package struct Session: Reducer {
                 }
             case let .internal(internalAction):
                 switch internalAction {
-                case let .getMeResponse(response):
+//                case let .getMeResponse(response):
+//                    switch response {
+//                    case .ok:
+//                        state.isLogined = true
+//                    default:
+//                        state.isLogined = false
+//                        print(response)
+//                    }
+                case let .getUsersResponse(response):
                     switch response {
-                    case .ok:
+                    case let .ok(okResponse):
                         state.isLogined = true
+                        do {
+                            state.users = try okResponse.body.json
+                        } catch {
+                            print(error)
+                        }
                     default:
                         state.isLogined = false
                         print(response)
@@ -75,9 +101,9 @@ package struct SessionView<Content: View>: View {
     @State private var id: String = ""
     @State private var password: String = ""
     private let store: StoreOf<Session>
-    private let contentView: () -> Content
+    private let contentView: ([Components.Schemas.User]) -> Content
 
-    package init(store: StoreOf<Session>, contentView: @escaping () -> Content) {
+    package init(store: StoreOf<Session>, contentView: @escaping ([Components.Schemas.User]) -> Content) {
         self.store = store
         self.contentView = contentView
     }
@@ -86,7 +112,7 @@ package struct SessionView<Content: View>: View {
         WithViewStore(store, observe: { $0 }) { viewStore in
             VStack(alignment: .center, spacing: 16) {
                 if viewStore.isLogined {
-                    contentView()
+                    contentView(viewStore.users)
                 } else {
                     TextField("ID", text: $id)
                         .keyboardType(.asciiCapable)
@@ -123,7 +149,7 @@ package struct SessionView<Content: View>: View {
             Session()
                 ._printChanges()
         }
-    ) {
-        Text("Login succeeded!")
+    ) { users in
+        Text("Login succeeded! (users: \(users.count)")
     }
 }
