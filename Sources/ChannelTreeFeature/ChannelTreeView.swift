@@ -43,7 +43,7 @@ package struct ChannelTree {
         case destination(PresentationAction<Channel.Action>)
 
         package enum ViewAction {
-            case onAppear
+            case appeared
             case nodeTapped(channel: Components.Schemas.Channel)
             case nodeDismissed
         }
@@ -61,7 +61,7 @@ package struct ChannelTree {
             switch action {
             case let .view(viewAction):
                 switch viewAction {
-                case .onAppear:
+                case .appeared:
                     state.isLoading = true
                     return .run { send in
                         let response = try await traqAPIClient.getChannels(query: .init(include_hyphen_dm: false))
@@ -121,7 +121,7 @@ package struct ChannelTreeView: View {
             )
         }
         .onAppear {
-            viewStore.send(.view(.onAppear))
+            viewStore.send(.view(.appeared))
         }
         .fullScreenCover(item: $store.scope(state: \.destination, action: \.destination)) { store in
             ZStack {
