@@ -14,78 +14,32 @@ package struct Markdown: View {
 
     package var markdown: String {
         let fileID = Reference(Substring.self)
-        let stampRaw = Reference(Substring.self)
-        let stampName = Reference(Substring.self)
-        let embedJSON = Reference(Substring.self)
-        let embedType = Reference(Substring.self)
-        let embedRaw = Reference(Substring.self)
-        let embedID = Reference(Substring.self)
 
         var replaced = raw
         // image files
-        replaced.replace(
-            Regex {
-                traqServerURL.absoluteString.replacingOccurrences(of: "/api/v3", with: "")
-                "/files/"
-                Capture(as: fileID) { uuidRegex() }
+        replaced.replace(/(?<url>https:\/\/.+\/files\/(?<fileId>[0-9a-f-]+))/) { match in
+            guard let url = URL(string: String(match.url)), url.host() == traqServerURL.host() else {
+                return match.url
             }
-        ) { match in
-            "![](\(traqServerURL.appending(path: "/files/\(match[fileID])/thumbnail")))"
+            return "![](\(traqServerURL.appending(path: "/files/\(match.fileId)/thumbnail")))"
         }
         // stamps
-        replaced.replace(
-            Regex {
-                Capture(as: stampRaw) {
-                    ":"
-                    Capture(as: stampName) {
-                        Repeat(1 ... 32) {
-                            CharacterClass(
-                                .anyOf("_-"),
-                                "0" ... "9",
-                                "a" ... "z",
-                                "A" ... "Z"
-                            )
-                        }
-                    }
-                    ZeroOrMore {
-                        "."
-                        OneOrMore(CharacterClass.anyOf(".:").inverted)
-                    }
-                    ":"
-                }
-            }) { match in
-                guard let stamp = stamps.first(where: { $0.name == match[stampName] }) else {
-                    return match[stampRaw]
-                }
-                print(stamp)
-                return "![\(match[stampRaw])](\(traqServerURL.appending(path: "/stamps/\(stamp.id)/image")))"
+        replaced.replace(/(?<raw>:(?<name>[@0-9a-zA-Z_-]+)(\.[a-z-]+)*:)/) { match in
+            let name = String(match.name)
+            if name.starts(with: "@") {
+                return "![\(match.raw)](\(traqServerURL.appending(path: "/public/icon/\(name.suffix(name.count - 1))")))"
             }
+
+            guard let stamp = stamps.first(where: { $0.name == match.name }) else {
+                return String(match.raw)
+            }
+            return "![\(match.raw)](\(traqServerURL.appending(path: "/stamps/\(stamp.id)/image")))"
+        }
         // embeded links
         replaced.replace(
-            Regex {
-                "!"
-                Capture(as: embedJSON) {
-                    "{\"type\":\""
-                    Capture(as: embedType) {
-                        ChoiceOf {
-                            "channel"
-                            "group"
-                            "user"
-                        }
-                    }
-                    "\",\"raw\":\""
-                    Capture(as: embedRaw) {
-                        OneOrMore(CharacterClass.anyOf("\"").inverted)
-                    }
-                    "\",\"id\":\""
-                    Capture(as: embedID) {
-                        uuidRegex()
-                    }
-                    "\"}"
-                }
-            }
+            /!(?<json>{"type":"(?<type>(channel|group|user))","raw":"(?<raw>[^"]*)","id":"(?<id>[0-9a-f-]+)"})/
         ) { match in
-            "**[\(match[embedRaw])](\(traqServerURL.appending(path: "/\(match[embedType])s/\(match[embedID])")))**"
+            "**[\(match.raw)](\(traqServerURL.appending(path: "/\(match.type)s/\(match.id)")))**"
         }
 
         return replaced
@@ -94,31 +48,6 @@ package struct Markdown: View {
     public var body: some View {
         MarkdownUI.Markdown(markdown)
             .markdownTheme(.gitHub)
-    }
-
-    private func uuidRegex() -> Regex<Substring> {
-        func repeatHex(count: Int) -> Repeat<Substring> {
-            Repeat(count: count) {
-                CharacterClass(
-                    "0" ... "9",
-                    "a" ... "f",
-                    "A" ... "F"
-                )
-            }
-        }
-
-        return Regex<Substring> {
-            repeatHex(count: 8)
-            "-"
-            repeatHex(count: 4)
-            "-"
-            "4"
-            repeatHex(count: 3)
-            "-"
-            repeatHex(count: 4)
-            "-"
-            repeatHex(count: 12)
-        }
     }
 }
 
