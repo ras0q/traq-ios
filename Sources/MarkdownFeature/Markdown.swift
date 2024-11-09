@@ -30,8 +30,7 @@ package struct Markdown: View {
                 Capture(as: fileID) { uuidRegex() }
             }
         ) { match in
-            // FIXME: 認証を通して画像を表示させる
-            "[](\(traqServerURL.appending(path: "/files/\(match[fileID])/thumbnail")))"
+            "![](\(traqServerURL.appending(path: "/files/\(match[fileID])/thumbnail")))"
         }
         // stamps
         replaced.replace(
@@ -59,8 +58,7 @@ package struct Markdown: View {
                     return match[stampRaw]
                 }
                 print(stamp)
-                // FIXME: 認証を通して画像を表示させる
-                return "[\(match[stampRaw])](\(traqServerURL.appending(path: "/files/\(stamp.fileId)/thumbnail")))"
+                return "![\(match[stampRaw])](\(traqServerURL.appending(path: "/stamps/\(stamp.id)/image")))"
             }
         // embeded links
         replaced.replace(
