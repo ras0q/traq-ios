@@ -47,7 +47,7 @@ package struct Markdown: View {
 
     public var body: some View {
         MarkdownUI.Markdown(markdown)
-            .markdownTheme(.gitHub)
+            .markdownTheme(.basic)
     }
 }
 
