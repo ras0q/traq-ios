@@ -27,13 +27,14 @@ package struct URLImage: View {
                         URLImage.imageCache[url] = image
                     }
                 case .empty:
-                    ProgressView()
-                case .failure:
                     Image(systemName: "questionmark").resizable()
+                case .failure:
+                    Image(systemName: "xmark").resizable()
                 @unknown default:
                     fatalError("unknown phase")
                 }
             }
+            .aspectRatio(contentMode: .fit)
         }
     }
 }

@@ -48,6 +48,19 @@ package struct Markdown: View {
     public var body: some View {
         MarkdownUI.Markdown(markdown)
             .markdownTheme(.basic)
+            .markdownImageProvider(LazyImageProvider())
+    }
+}
+
+package struct LazyImageProvider: @preconcurrency ImageProvider {
+    // FIXME: Actor分離したい
+    @MainActor package func makeImage(url: URL?) -> some View {
+        let image = URLImage(url: url)
+        if url?.relativePath.contains(/\/stamps\/[0-9a-f-]+\/image/) ?? false {
+            image.frame(width: 16, height: 16)
+        } else {
+            image
+        }
     }
 }
 
