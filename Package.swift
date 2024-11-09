@@ -7,6 +7,7 @@ let package = Package(
     name: "Feature",
     platforms: [.iOS(.v17)],
     products: [
+        .library(name: "ChannelFeature", targets: ["ChannelFeature"]),
         .library(name: "ChannelTreeFeature", targets: ["ChannelTreeFeature"]),
         .library(name: "SessionFeature", targets: ["SessionFeature"]),
         .library(name: "TraqAPI", targets: ["TraqAPI"]),
@@ -20,8 +21,16 @@ let package = Package(
     ],
     targets: [
         .target(
+            name: "ChannelFeature",
+            dependencies: [
+                "TraqAPI",
+                .product(name: "ComposableArchitecture", package: "swift-composable-architecture"),
+            ]
+        ),
+        .target(
             name: "ChannelTreeFeature",
             dependencies: [
+                "ChannelFeature",
                 "TraqAPI",
                 .product(name: "ComposableArchitecture", package: "swift-composable-architecture"),
             ]

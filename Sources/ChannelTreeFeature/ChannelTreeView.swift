@@ -1,8 +1,10 @@
+import ChannelFeature
 import ComposableArchitecture
 import SwiftUI
 import TraqAPI
 
-package struct ChannelTree: Reducer {
+@Reducer
+package struct ChannelTree {
     package struct ChannelRecursive: Identifiable, Equatable {
         package var id: String { base.id }
         let base: Components.Schemas.Channel
@@ -26,9 +28,11 @@ package struct ChannelTree: Reducer {
         }
     }
 
+    @ObservableState
     package struct State: Equatable {
         var rootChannels: [ChannelRecursive] = []
         var isLoading: Bool = false
+        @Presents var destination: Channel.State?
 
         package init() {}
     }
@@ -36,9 +40,12 @@ package struct ChannelTree: Reducer {
     package enum Action {
         case view(ViewAction)
         case `internal`(InternalAction)
+        case destination(PresentationAction<Channel.Action>)
 
         package enum ViewAction {
             case onAppear
+            case nodeTapped(channel: Components.Schemas.Channel)
+            case nodeDismissed
         }
 
         package enum InternalAction {
@@ -60,7 +67,12 @@ package struct ChannelTree: Reducer {
                         let response = try await traqAPIClient.getChannels(query: .init(include_hyphen_dm: false))
                         await send(.internal(.getChannelsResponse(response)))
                     }
+                case let .nodeTapped(channel: channel):
+                    state.destination = Channel.State(channel: channel)
+                case .nodeDismissed:
+                    state.destination = nil
                 }
+                return .none
             case let .internal(internalAction):
                 switch internalAction {
                 case let .getChannelsResponse(response):
@@ -79,34 +91,62 @@ package struct ChannelTree: Reducer {
                     state.rootChannels = rootChannels
                 }
                 return .none
+            case .destination:
+                return .none
             }
+        }
+        .ifLet(\.$destination, action: \.destination) {
+            Channel()
         }
     }
 }
 
 package struct ChannelTreeView: View {
-    let store: StoreOf<ChannelTree>
+    @Bindable var store: StoreOf<ChannelTree>
+    let viewStore: ViewStoreOf<ChannelTree>
 
     package init(store: StoreOf<ChannelTree>) {
         self.store = store
+        self.viewStore = ViewStoreOf<ChannelTree>(store, observe: { $0 })
     }
 
     package var body: some View {
-        WithViewStore(store, observe: { $0 }) { viewStore in
-            Group {
-                List(viewStore.rootChannels, id: \.id, children: \.children) {
-                    ChannelTreeNodeView(
-                        store: .init(
-                            initialState: ChannelTreeNode.State(channel: $0.base)
-                        ) {
-                            ChannelTreeNode()
-                        }
+        List(viewStore.rootChannels, id: \.id, children: \.children) { channel in
+            ChannelTreeNodeView(
+                store: .init(
+                    initialState: ChannelTreeNode.State(channel: channel.base)
+                ) {
+                    ChannelTreeNode()
+                },
+                onNodeTapped: {
+                    viewStore.send(.view(.nodeTapped(channel: channel.base)))
+                }
+            )
+        }
+        .onAppear {
+            viewStore.send(.view(.onAppear))
+        }
+        .fullScreenCover(item: $store.scope(state: \.destination, action: \.destination)) { store in
+            ZStack {
+                Button(action: {
+                    viewStore.send(.view(.nodeDismissed))
+                }) {
+                    Text("")
+                    .frame(
+                        width: UIScreen.main.bounds.width,
+                        height: UIScreen.main.bounds.height
                     )
                 }
+
+                ChannelView(store: store)
+                    .frame(
+                        width: UIScreen.main.bounds.width * 0.8,
+                        height: UIScreen.main.bounds.height * 0.8
+                    )
+                    .background(Color.white)
+                    .clipShape(RoundedRectangle(cornerRadius: 16))
             }
-            .onAppear {
-                viewStore.send(.view(.onAppear))
-            }
+            .clearBackground()
         }
     }
 }

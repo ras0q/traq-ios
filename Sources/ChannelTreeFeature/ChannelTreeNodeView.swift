@@ -28,9 +28,11 @@ package struct ChannelTreeNode: Reducer {
 
 struct ChannelTreeNodeView: View {
     let store: StoreOf<ChannelTreeNode>
+    let onNodeTapped: () -> Void
 
-    init(store: StoreOf<ChannelTreeNode>) {
+    init(store: StoreOf<ChannelTreeNode>, onNodeTapped: @escaping () -> Void) {
         self.store = store
+        self.onNodeTapped = onNodeTapped
     }
 
     var body: some View {
@@ -46,6 +48,7 @@ struct ChannelTreeNodeView: View {
                 .contentShape(Rectangle()) // Spacerにも判定をつける
                 .onTapGesture {
                     viewStore.send(.view(.onTapped))
+                    onNodeTapped()
                 }
             }
         }
@@ -72,10 +75,15 @@ struct ChannelTreeNodeView: View {
 
 #Preview {
     ForEach(0 ..< 5) { index in
-        ChannelTreeNodeView(store: .init(
-            initialState: ChannelTreeNode.State(channel: .mock(index))
-        ) {
-            ChannelTreeNode()
-        })
+        ChannelTreeNodeView(
+            store: .init(
+                initialState: ChannelTreeNode.State(channel: .mock(index))
+            ) {
+                ChannelTreeNode()
+            },
+            onNodeTapped: {
+                print(index)
+            }
+        )
     }
 }
