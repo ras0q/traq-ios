@@ -1,4 +1,5 @@
 import ComposableArchitecture
+import MarkdownFeature
 import SwiftUI
 import TraqAPI
 
@@ -79,7 +80,7 @@ package struct ChannelView: View {
                     VStack (alignment: .leading) {
                         Text("@\(message.userId.prefix(10))") // TODO: use username
                             .bold()
-                        Text("\(message.content)")
+                        Markdown("\(message.content)", stamps: [])
                     }
                 }
                 .listStyle(.inset)
