@@ -7,55 +7,41 @@ struct ChannelMessageView: View {
     let message: Components.Schemas.Message
     let user: Components.Schemas.User
     let stamps: [Components.Schemas.StampWithThumbnail]
+    let messageStampsGroupby: [String : [Components.Schemas.MessageStamp]]
+
+    init(message: Components.Schemas.Message, user: Components.Schemas.User, stamps: [Components.Schemas.StampWithThumbnail]) {
+        self.message = message
+        self.user = user
+        self.stamps = stamps
+        self.messageStampsGroupby = .init(grouping: message.stamps) { $0.stampId }
+    }
 
     var body: some View {
         HStack(alignment: .top) {
-            UserIcon(iconFileId: user.iconFileId)
-                .frame(width: 40, height: 40, alignment: .leading)
+            URLImage(fileId: user.iconFileId)
+                .clipShape(Circle())
+                .frame(width: 40, height: 40)
             VStack (alignment: .leading) {
                 HStack {
                     Text(user.displayName).bold()
                     Text("@\(user.name)").font(.callout).foregroundStyle(Color.gray)
                 }
                 Markdown("\(message.content)", stamps: stamps)
-            }
-        }
-    }
-}
 
-package struct UserIcon: View {
-    private static var iconImageDictionary: [URL?: Image] = [:]
-
-    private let iconUrl: URL?
-
-    package init(iconFileId: String) {
-        iconUrl = traqServerURL.appending(path: "/files/\(iconFileId)")
-    }
-
-    package var body: some View {
-        if let image = UserIcon.iconImageDictionary[iconUrl] {
-            image
-                .resizable()
-                .clipShape(Circle())
-        } else {
-            AsyncImage(url: iconUrl) { phase in
-                switch phase {
-                case let .success(image):
-                    image
-                        .resizable()
-                        .clipShape(Circle())
-                        .task(id: iconUrl) {
-                            UserIcon.iconImageDictionary[iconUrl] = image
+                let keys = messageStampsGroupby.keys.map { $0 }
+                let keyIndices = keys.indices
+                let values = keys.compactMap { messageStampsGroupby[$0] }
+                LazyVGrid(
+                    columns: Array(repeating: GridItem(.adaptive(minimum: 50)), count: 1),
+                    spacing: 10
+                ) {
+                    ForEach(messageStampsGroupby.sorted(by: { $0.key < $1.key }), id: \.key) { key, value in
+                        HStack {
+                            URLImage(stampId: value[0].stampId)
+                                .frame(width: 24, height: 24)
+                            Text("\(value.count)").font(.callout)
                         }
-                case .empty:
-                    ProgressView()
-                        .clipShape(Circle())
-                case .failure:
-                    Image(systemName: "person.crop.circle")
-                        .resizable()
-                        .clipShape(Circle())
-                @unknown default:
-                    fatalError("unknown phase")
+                    }
                 }
             }
         }
