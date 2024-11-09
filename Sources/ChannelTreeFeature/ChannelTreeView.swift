@@ -80,7 +80,7 @@ package struct ChannelTree {
                     switch response {
                     case let .ok(ok):
                         return .run { send in
-                            let publicChannels = try ok.body.json._public
+                            let publicChannels = try ok.body.json._public.filter { !$0.archived }
                             let rootChannels = ChannelRecursive(channels: publicChannels)?.children ?? []
                             await send(.internal(.channelTreeConstructed(rootChannels)))
                         }
@@ -137,10 +137,14 @@ package struct ChannelTreeView: View {
 
                 ChannelView(store: store)
                     .frame(
-                        width: UIScreen.main.bounds.width * 0.8,
+                        width: UIScreen.main.bounds.width * 0.9,
                         height: UIScreen.main.bounds.height * 0.8
                     )
                     .background(Color.white)
+                    .overlay {
+                        RoundedRectangle(cornerRadius: 16)
+                            .stroke(Color.primary, lineWidth: 1)
+                    }
                     .clipShape(RoundedRectangle(cornerRadius: 16))
             }
             .clearBackground()
