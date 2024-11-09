@@ -141,11 +141,9 @@ package struct ChannelTreeView: View {
                         height: UIScreen.main.bounds.height * 0.8
                     )
                     .background(Color.white)
-                    .overlay {
-                        RoundedRectangle(cornerRadius: 16)
-                            .stroke(Color.primary, lineWidth: 1)
-                    }
                     .clipShape(RoundedRectangle(cornerRadius: 16))
+                    .compositingGroup()
+                    .shadow(radius: 10)
             }
             .clearBackground()
         }
