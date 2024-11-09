@@ -113,11 +113,8 @@ package struct ChannelTreeView: View {
     package var body: some View {
         List(viewStore.rootChannels, id: \.id, children: \.children) { channel in
             ChannelTreeNodeView(
-                store: .init(
-                    initialState: ChannelTreeNode.State(channel: channel.base)
-                ) {
-                    ChannelTreeNode()
-                },
+                name: channel.base.name,
+                hasChildren: channel.base.children.count > 0,
                 onNodeTapped: {
                     viewStore.send(.view(.nodeTapped(channel: channel.base)))
                 }
