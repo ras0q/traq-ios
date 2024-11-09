@@ -83,7 +83,9 @@ package struct ChannelTree {
                     switch response {
                     case let .ok(ok):
                         return .run { send in
-                            let publicChannels = try ok.body.json._public.filter { !$0.archived }
+                            let publicChannels = try ok.body.json._public
+                                .filter { !$0.archived }
+                                .sorted { $0.name.lowercased() < $1.name.lowercased() }
                             let rootChannels = ChannelRecursive(channels: publicChannels)?.children ?? []
                             await send(.internal(.channelTreeConstructed(rootChannels)))
                         }

@@ -42,7 +42,8 @@ package struct Channel {
                 case .appeared:
                     return .run { [channel = state.channel] send in
                         let response = try await traqAPIClient.getMessages(
-                            path: .init(channelId: channel.id)
+                            path: .init(channelId: channel.id),
+                            query: .init(order: .desc)
                         )
                         await send(.internal(.getMessagesResponse(response)))
                     }
@@ -54,6 +55,7 @@ package struct Channel {
                     case let .ok(okResponse):
                         do {
                             state.messages = try okResponse.body.json
+                                .sorted { $0.createdAt < $1.createdAt }
                         } catch {
                             print(error)
                         }
