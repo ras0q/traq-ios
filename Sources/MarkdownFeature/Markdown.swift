@@ -5,9 +5,9 @@ import TraqAPI
 
 package struct Markdown: View {
     package let raw: String
-    package let stamps: [Components.Schemas.Stamp]
+    package let stamps: [Components.Schemas.StampWithThumbnail]
 
-    package init(_ raw: String, stamps: [Components.Schemas.Stamp]) {
+    package init(_ raw: String, stamps: [Components.Schemas.StampWithThumbnail]) {
         self.raw = raw
         self.stamps = stamps
     }
@@ -30,7 +30,8 @@ package struct Markdown: View {
                 Capture(as: fileID) { uuidRegex() }
             }
         ) { match in
-            "![](\(traqServerURL.appending(path: "/files/\(match[fileID])/thumbnail")))"
+            // FIXME: 認証を通して画像を表示させる
+            "[](\(traqServerURL.appending(path: "/files/\(match[fileID])/thumbnail")))"
         }
         // stamps
         replaced.replace(
@@ -57,7 +58,9 @@ package struct Markdown: View {
                 guard let stamp = stamps.first(where: { $0.name == match[stampName] }) else {
                     return match[stampRaw]
                 }
-                return "![\(match[stampRaw])](\(traqServerURL.appending(path: "/files/\(stamp.fileId)/thumbnail"))"
+                print(stamp)
+                // FIXME: 認証を通して画像を表示させる
+                return "[\(match[stampRaw])](\(traqServerURL.appending(path: "/files/\(stamp.fileId)/thumbnail")))"
             }
         // embeded links
         replaced.replace(
@@ -230,7 +233,8 @@ package struct Markdown: View {
                     createdAt: Date(),
                     updatedAt: Date(),
                     fileId: UUID().uuidString,
-                    isUnicode: false
+                    isUnicode: false,
+                    hasThumbnail: false
                 ),
             ]
         )

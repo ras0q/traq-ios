@@ -10,6 +10,8 @@ package struct Session: Reducer {
         var isLogined: Bool = false
         @Shared(.inMemory("users"))
         package var users: [Components.Schemas.User] = []
+        @Shared(.inMemory("stamps"))
+        package var stamps: [Components.Schemas.StampWithThumbnail] = []
 
         package init(isLogined: Bool = false) {
             self.isLogined = isLogined
@@ -28,6 +30,7 @@ package struct Session: Reducer {
         package enum InternalAction {
             case getMeResponse(Operations.getMe.Output)
             case getUsersResponse(Operations.getUsers.Output)
+            case getStampsResponse(Operations.getStamps.Output)
             case loginResponse(Operations.login.Output)
         }
     }
@@ -50,6 +53,10 @@ package struct Session: Reducer {
                                 .init(query: .init(include_hyphen_suspended: true))
                             )
                             await send(.internal(.getUsersResponse(getUsersResponse)))
+                        },
+                        .run { send in
+                            let getStampsResponse = try await traqAPIClient.getStamps()
+                            await send(.internal(.getStampsResponse(getStampsResponse)))
                         }
                     )
                 case let .loginButtonTapped(name: name, password: password):
@@ -75,6 +82,17 @@ package struct Session: Reducer {
                     case let .ok(okResponse):
                         do {
                             state.users = try okResponse.body.json
+                        } catch {
+                            print(error)
+                        }
+                    default:
+                        print(response)
+                    }
+                case let .getStampsResponse(response):
+                    switch response {
+                    case let .ok(okResponse):
+                        do {
+                            state.stamps = try okResponse.body.json
                         } catch {
                             print(error)
                         }

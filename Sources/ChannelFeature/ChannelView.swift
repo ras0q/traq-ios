@@ -11,6 +11,8 @@ package struct Channel {
         var messages: [Components.Schemas.Message] = []
         @Shared(.inMemory("users"))
         package var users: [Components.Schemas.User] = []
+        @Shared(.inMemory("stamps"))
+        package var stamps: [Components.Schemas.StampWithThumbnail] = []
 
         package init(channel: Components.Schemas.Channel) {
             self.channel = channel
@@ -85,7 +87,8 @@ package struct ChannelView: View {
                 List(viewStore.messages, id: \.id) { message in
                     ChannelMessageView(
                         message: message,
-                        user: viewStore.users.first(where: { $0.id == message.userId })!
+                        user: viewStore.users.first(where: { $0.id == message.userId })!,
+                        stamps: viewStore.stamps
                     )
                 }
                 .listStyle(.inset)

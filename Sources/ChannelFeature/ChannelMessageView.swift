@@ -6,6 +6,7 @@ import TraqAPI
 struct ChannelMessageView: View {
     let message: Components.Schemas.Message
     let user: Components.Schemas.User
+    let stamps: [Components.Schemas.StampWithThumbnail]
 
     var body: some View {
         HStack(alignment: .top) {
@@ -16,7 +17,7 @@ struct ChannelMessageView: View {
                     Text(user.displayName).bold()
                     Text("@\(user.name)").font(.callout).foregroundStyle(Color.gray)
                 }
-                Markdown("\(message.content)", stamps: [])
+                Markdown("\(message.content)", stamps: stamps)
             }
         }
     }
