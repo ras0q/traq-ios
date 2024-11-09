@@ -2,11 +2,13 @@ import ComposableArchitecture
 import SwiftUI
 import TraqAPI
 
+extension Components.Schemas.User: Identifiable {}
+
 package struct Session: Reducer {
     @ObservableState
-    package struct State: Equatable {
+    package struct State {
         var isLogined: Bool = false
-        // TODO: should users be shared?
+        @Shared(.inMemory("users"))
         package var users: [Components.Schemas.User] = []
 
         package init(isLogined: Bool = false) {
@@ -24,7 +26,7 @@ package struct Session: Reducer {
         }
 
         package enum InternalAction {
-//            case getMeResponse(Operations.getMe.Output)
+            case getMeResponse(Operations.getMe.Output)
             case getUsersResponse(Operations.getUsers.Output)
             case loginResponse(Operations.login.Output)
         }
@@ -38,12 +40,11 @@ package struct Session: Reducer {
             case let .view(viewAction):
                 switch viewAction {
                 case .onAppear:
-                    // FIXME: 複数のリクエストを同時に投げると画面が描画されないので今はgetUsersでログイン確認を行っている。SessionViewの表示時にさらにリクエストが増えるとこれを解決しなければならない。
                     return .merge(
-//                        .run { send in
-//                            let getMeResponse = try await traqAPIClient.getMe()
-//                            await send(.internal(.getMeResponse(getMeResponse)))
-//                        },
+                        .run { send in
+                            let getMeResponse = try await traqAPIClient.getMe()
+                            await send(.internal(.getMeResponse(getMeResponse)))
+                        },
                         .run { send in
                             let getUsersResponse = try await traqAPIClient.getUsers(
                                 .init(query: .init(include_hyphen_suspended: true))
@@ -61,25 +62,23 @@ package struct Session: Reducer {
                 }
             case let .internal(internalAction):
                 switch internalAction {
-//                case let .getMeResponse(response):
-//                    switch response {
-//                    case .ok:
-//                        state.isLogined = true
-//                    default:
-//                        state.isLogined = false
-//                        print(response)
-//                    }
+                case let .getMeResponse(response):
+                    switch response {
+                    case .ok:
+                        state.isLogined = true
+                    default:
+                        state.isLogined = false
+                        print(response)
+                    }
                 case let .getUsersResponse(response):
                     switch response {
                     case let .ok(okResponse):
-                        state.isLogined = true
                         do {
                             state.users = try okResponse.body.json
                         } catch {
                             print(error)
                         }
                     default:
-                        state.isLogined = false
                         print(response)
                     }
                 case let .loginResponse(response):
@@ -101,39 +100,37 @@ package struct SessionView<Content: View>: View {
     @State private var id: String = ""
     @State private var password: String = ""
     private let store: StoreOf<Session>
-    private let contentView: ([Components.Schemas.User]) -> Content
+    private let contentView: () -> Content
 
-    package init(store: StoreOf<Session>, contentView: @escaping ([Components.Schemas.User]) -> Content) {
+    package init(store: StoreOf<Session>, contentView: @escaping () -> Content) {
         self.store = store
         self.contentView = contentView
     }
 
     package var body: some View {
-        WithViewStore(store, observe: { $0 }) { viewStore in
-            VStack(alignment: .center, spacing: 16) {
-                if viewStore.isLogined {
-                    contentView(viewStore.users)
-                } else {
-                    TextField("ID", text: $id)
-                        .keyboardType(.asciiCapable)
-                        .autocorrectionDisabled()
-                        .textInputAutocapitalization(.never)
-                        .padding()
-                        .overlay { borderStyle }
-                    SecureField("Password", text: $password)
-                        .keyboardType(.asciiCapable)
-                        .padding()
-                        .overlay { borderStyle }
-                    Button("ログイン") {
-                        viewStore.send(.view(.loginButtonTapped(name: id, password: password)))
-                    }
-                    .buttonStyle(.borderedProminent)
+        VStack(alignment: .center, spacing: 16) {
+            if store.isLogined {
+                contentView()
+            } else {
+                TextField("ID", text: $id)
+                    .keyboardType(.asciiCapable)
+                    .autocorrectionDisabled()
+                    .textInputAutocapitalization(.never)
+                    .padding()
+                    .overlay { borderStyle }
+                SecureField("Password", text: $password)
+                    .keyboardType(.asciiCapable)
+                    .padding()
+                    .overlay { borderStyle }
+                Button("ログイン") {
+                    store.send(.view(.loginButtonTapped(name: id, password: password)))
                 }
+                .buttonStyle(.borderedProminent)
             }
-            .padding()
-            .onAppear {
-                viewStore.send(.view(.onAppear))
-            }
+        }
+        .padding()
+        .onAppear {
+            store.send(.view(.onAppear))
         }
     }
 
@@ -149,7 +146,7 @@ package struct SessionView<Content: View>: View {
             Session()
                 ._printChanges()
         }
-    ) { users in
-        Text("Login succeeded! (users: \(users.count)")
+    ) {
+        Text("Login succeeded!")
     }
 }

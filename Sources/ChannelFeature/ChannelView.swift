@@ -8,12 +8,12 @@ package struct Channel {
     @ObservableState
     package struct State: Equatable {
         let channel: Components.Schemas.Channel
-        let users: [Components.Schemas.User]
         var messages: [Components.Schemas.Message] = []
+        @Shared(.inMemory("users"))
+        package var users: [Components.Schemas.User] = []
 
-        package init(channel: Components.Schemas.Channel, users: [Components.Schemas.User]) {
+        package init(channel: Components.Schemas.Channel) {
             self.channel = channel
-            self.users = users
         }
     }
 
