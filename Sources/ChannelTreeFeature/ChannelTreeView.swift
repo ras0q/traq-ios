@@ -45,7 +45,7 @@ package struct ChannelTree {
         package init() {}
     }
 
-    package enum Action {
+    package enum Action: ViewAction {
         case view(ViewAction)
         case `internal`(InternalAction)
         case destination(PresentationAction<Channel.Action>)
@@ -111,33 +111,32 @@ package struct ChannelTree {
     }
 }
 
+@ViewAction(for: ChannelTree.self)
 package struct ChannelTreeView: View {
-    @Bindable var store: StoreOf<ChannelTree>
-    let viewStore: ViewStoreOf<ChannelTree>
+    @Bindable package var store: StoreOf<ChannelTree>
 
     package init(store: StoreOf<ChannelTree>) {
         self.store = store
-        self.viewStore = ViewStoreOf<ChannelTree>(store, observe: { $0 })
     }
 
     package var body: some View {
-        List(viewStore.rootChannels, id: \.id, children: \.children) { channel in
+        List(store.rootChannels, id: \.id, children: \.children) { channel in
             ChannelTreeNodeView(
                 name: channel.base.name,
                 hasChildren: channel.base.children.count > 0,
                 onNodeTapped: {
-                    viewStore.send(.view(.nodeTapped(channel: channel.base, channelPath: channel.path)))
+                    send(.nodeTapped(channel: channel.base, channelPath: channel.path))
                 }
             )
         }
         .listStyle(.inset)
         .onAppear {
-            viewStore.send(.view(.appeared))
+            send(.appeared)
         }
         .fullScreenCover(item: $store.scope(state: \.destination, action: \.destination)) { store in
             ZStack {
                 Button(action: {
-                    viewStore.send(.view(.nodeDismissed))
+                    send(.nodeDismissed)
                 }) {
                     Text("")
                     .frame(

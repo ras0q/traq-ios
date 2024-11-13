@@ -23,7 +23,7 @@ package struct Channel {
         }
     }
 
-    package enum Action {
+    package enum Action: ViewAction {
         case view(ViewAction)
         case `internal`(InternalAction)
 
@@ -113,49 +113,48 @@ package struct Channel {
     }
 }
 
+@ViewAction(for: Channel.self)
 package struct ChannelView: View {
-    let store: StoreOf<Channel>
+    package let store: StoreOf<Channel>
 
     package init(store: StoreOf<Channel>) {
         self.store = store
     }
 
     package var body: some View {
-        WithViewStore(store, observe: { $0 }) { viewStore in
-            VStack(alignment: .leading) {
-                Text(viewStore.channelPath.replacing("/", maxReplacements: 1, with: { _ in "#" }))
-                    .font(.title)
-                    .bold()
-                List(viewStore.messages, id: \.id) { message in
-                    ChannelMessageView(
-                        message: message,
-                        user: viewStore.users.first(where: { $0.id == message.userId })!,
-                        stamps: viewStore.stamps
-                    )
-                    .swipeActions(edge: .leading, allowsFullSwipe: true) {
-                        Button {
-                            viewStore.send(.view(.messageClipped(messageId: message.id)))
-                        } label: {
-                            Label("クリップ", systemImage: "bookmark.fill")
-                        }
-                        .tint(.green)
+        VStack(alignment: .leading) {
+            Text(store.channelPath.replacing("/", maxReplacements: 1, with: { _ in "#" }))
+                .font(.title)
+                .bold()
+            List(store.messages, id: \.id) { message in
+                ChannelMessageView(
+                    message: message,
+                    user: store.users.first(where: { $0.id == message.userId })!,
+                    stamps: store.stamps
+                )
+                .swipeActions(edge: .leading, allowsFullSwipe: true) {
+                    Button {
+                        send(.messageClipped(messageId: message.id))
+                    } label: {
+                        Label("クリップ", systemImage: "bookmark.fill")
                     }
-                    .swipeActions(edge: .trailing, allowsFullSwipe: true) {
-                        Button {
-                            UIPasteboard.general.string = "https://\(traqServerURL.host()!)/messages/\(message.id)"
-                        } label: {
-                            Label("リンクをコピー", systemImage: "link")
-                        }
-                        .tint(.blue)
-                    }
+                    .tint(.green)
                 }
-                .listStyle(.inset)
-                Spacer()
+                .swipeActions(edge: .trailing, allowsFullSwipe: true) {
+                    Button {
+                        UIPasteboard.general.string = "https://\(traqServerURL.host()!)/messages/\(message.id)"
+                    } label: {
+                        Label("リンクをコピー", systemImage: "link")
+                    }
+                    .tint(.blue)
+                }
             }
-            .padding()
-            .onAppear {
-                viewStore.send(.view(.appeared))
-            }
+            .listStyle(.inset)
+            Spacer()
+        }
+        .padding()
+        .onAppear {
+            send(.appeared)
         }
     }
 }

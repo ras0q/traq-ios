@@ -18,7 +18,7 @@ package struct Session: Reducer {
         }
     }
 
-    package enum Action {
+    package enum Action: ViewAction {
         case view(ViewAction)
         case `internal`(InternalAction)
 
@@ -114,10 +114,11 @@ package struct Session: Reducer {
     }
 }
 
+@ViewAction(for: Session.self)
 package struct SessionView<Content: View>: View {
     @State private var id: String = ""
     @State private var password: String = ""
-    private let store: StoreOf<Session>
+    package let store: StoreOf<Session>
     private let contentView: () -> Content
 
     package init(store: StoreOf<Session>, contentView: @escaping () -> Content) {
@@ -141,14 +142,14 @@ package struct SessionView<Content: View>: View {
                     .padding()
                     .overlay { borderStyle }
                 Button("ログイン") {
-                    store.send(.view(.loginButtonTapped(name: id, password: password)))
+                    send(.loginButtonTapped(name: id, password: password))
                 }
                 .buttonStyle(.borderedProminent)
             }
         }
         .padding()
         .onAppear {
-            store.send(.view(.onAppear))
+            send(.onAppear)
         }
     }
 
