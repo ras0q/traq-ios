@@ -67,7 +67,10 @@ package struct Channel {
                         return .none
                     }
                     return .run { send in
-                        let response = try await traqAPIClient.clipMessage(path: .init(folderId: clipFolderId))
+                        let response = try await traqAPIClient.clipMessage(
+                            path: .init(folderId: clipFolderId),
+                            body: .json(.init(messageId: messageId))
+                        )
                         await send(.internal(.clipMessageResponse(response)))
                     }
                 }

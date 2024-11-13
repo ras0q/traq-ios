@@ -28,9 +28,6 @@ struct ChannelMessageView: View {
                 }
                 Markdown("\(message.content)", stamps: stamps)
 
-                let keys = messageStampsGroupby.keys.map { $0 }
-                let keyIndices = keys.indices
-                let values = keys.compactMap { messageStampsGroupby[$0] }
                 LazyVGrid(
                     columns: Array(repeating: GridItem(.adaptive(minimum: 50)), count: 1),
                     spacing: 10

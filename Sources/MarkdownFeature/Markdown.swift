@@ -13,8 +13,6 @@ package struct Markdown: View {
     }
 
     package var markdown: String {
-        let fileID = Reference(Substring.self)
-
         var replaced = raw
         // image files
         replaced.replace(/(?<url>https:\/\/.+\/files\/(?<fileId>[0-9a-f-]+))/) { match in
