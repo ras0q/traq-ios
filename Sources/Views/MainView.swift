@@ -11,11 +11,14 @@ public struct MainView: View {
                 Session()
             }
         ) {
-            ChannelTreeView(
-                store: .init(initialState: ChannelTree.State()) {
-                    ChannelTree()
-                }
-            )
+            NavigationStack {
+                ChannelTreeView(
+                    store: .init(initialState: ChannelTree.State()) {
+                        ChannelTree()
+                    }
+                )
+                .navigationTitle("Channels")
+            }
         }
     }
 }

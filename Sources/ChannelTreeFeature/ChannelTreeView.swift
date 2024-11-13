@@ -130,6 +130,7 @@ package struct ChannelTreeView: View {
                 }
             )
         }
+        .listStyle(.inset)
         .onAppear {
             viewStore.send(.view(.appeared))
         }
