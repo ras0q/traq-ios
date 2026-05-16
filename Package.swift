@@ -1,11 +1,11 @@
-// swift-tools-version: 6.0
+// swift-tools-version: 6.2
 // The swift-tools-version declares the minimum version of Swift required to build this package.
 
 import PackageDescription
 
 let package = Package(
     name: "Feature",
-    platforms: [.iOS(.v17)],
+    platforms: [.iOS(.v26)],
     products: [
         .library(name: "ChannelFeature", targets: ["ChannelFeature"]),
         .library(name: "ChannelTreeFeature", targets: ["ChannelTreeFeature"]),
@@ -16,10 +16,10 @@ let package = Package(
     ],
     dependencies: [
         .package(url: "https://github.com/gonzalezreal/swift-markdown-ui", from: "2.4.1"),
-        .package(url: "https://github.com/pointfreeco/swift-composable-architecture", from: "1.16.0"),
-        .package(url: "https://github.com/apple/swift-openapi-generator", from: "1.4.0"),
-        .package(url: "https://github.com/apple/swift-openapi-runtime", from: "1.6.0"),
-        .package(url: "https://github.com/apple/swift-openapi-urlsession", from: "1.0.2"),
+        .package(url: "https://github.com/pointfreeco/swift-composable-architecture", from: "1.25.0"),
+        .package(url: "https://github.com/apple/swift-openapi-generator", from: "1.12.1"),
+        .package(url: "https://github.com/apple/swift-openapi-runtime", from: "1.11.0"),
+        .package(url: "https://github.com/apple/swift-openapi-urlsession", from: "1.3.0"),
     ],
     targets: [
         .target(
