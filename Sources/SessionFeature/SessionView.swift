@@ -81,7 +81,10 @@ package struct Session: Reducer {
                     switch response {
                     case let .ok(okResponse):
                         do {
-                            state.users = try okResponse.body.json
+                            let newUsers = try okResponse.body.json
+                            state.$users.withLock {
+                                $0 = newUsers
+                            }
                         } catch {
                             print(error)
                         }
@@ -92,7 +95,10 @@ package struct Session: Reducer {
                     switch response {
                     case let .ok(okResponse):
                         do {
-                            state.stamps = try okResponse.body.json
+                            let newStamps = try okResponse.body.json
+                            state.$stamps.withLock {
+                                $0 = newStamps
+                            }
                         } catch {
                             print(error)
                         }
