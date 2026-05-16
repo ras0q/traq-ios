@@ -4,7 +4,7 @@ import OpenAPIURLSession
 
 package let traqServerURL = {
     do {
-        let url = try Servers.Server1.url()
+        let url = try Servers.Server2.url()
         return url
     } catch {
         fatalError()
