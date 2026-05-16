@@ -43,22 +43,10 @@ package struct Session: Reducer {
             case let .view(viewAction):
                 switch viewAction {
                 case .onAppear:
-                    return .merge(
-                        .run { send in
-                            let getMeResponse = try await traqAPIClient.getMe()
-                            await send(.internal(.getMeResponse(getMeResponse)))
-                        },
-                        .run { send in
-                            let getUsersResponse = try await traqAPIClient.getUsers(
-                                .init(query: .init(include_hyphen_suspended: true))
-                            )
-                            await send(.internal(.getUsersResponse(getUsersResponse)))
-                        },
-                        .run { send in
-                            let getStampsResponse = try await traqAPIClient.getStamps()
-                            await send(.internal(.getStampsResponse(getStampsResponse)))
-                        }
-                    )
+                    return .run { send in
+                        let getMeResponse = try await traqAPIClient.getMe()
+                        await send(.internal(.getMeResponse(getMeResponse)))
+                    }
                 case let .loginButtonTapped(name: name, password: password):
                     return .run { send in
                         let response = try await traqAPIClient.login(
@@ -73,6 +61,18 @@ package struct Session: Reducer {
                     switch response {
                     case .ok:
                         state.isLogined = true
+                        return .merge(
+                            .run { send in
+                                let getUsersResponse = try await traqAPIClient.getUsers(
+                                    .init(query: .init(include_hyphen_suspended: true))
+                                )
+                                await send(.internal(.getUsersResponse(getUsersResponse)))
+                            },
+                            .run { send in
+                                let getStampsResponse = try await traqAPIClient.getStamps()
+                                await send(.internal(.getStampsResponse(getStampsResponse)))
+                            }
+                        )
                     default:
                         state.isLogined = false
                         print(response)
