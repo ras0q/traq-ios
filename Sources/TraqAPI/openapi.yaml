@@ -1,39 +1,37 @@
-# https://raw.githubusercontent.com/traPtitech/traQ/refs/heads/master/docs/v3-api.yaml
-
 openapi: 3.0.0
 info:
   title: traQ v3
-  version: '3.0'
+  version: "3.0"
   description: traQ v3 API
   license:
     name: MIT
-    url: 'https://github.com/traPtitech/traQ/blob/master/LICENSE'
+    url: "https://github.com/traPtitech/traQ/blob/master/LICENSE"
   contact:
     name: traP
-    url: 'https://github.com/traPtitech/traQ'
+    url: "https://github.com/traPtitech/traQ"
 servers:
-  - url: 'https://q.trap.jp/api/v3'
+  - url: "https://q.trap.jp/api/v3"
     description: production
-  - url: 'https://q-dev.trapti.tech/api/v3'
+  - url: "https://q-dev.trapti.tech/api/v3"
     description: staging
-  - url: 'http://localhost:3000/api/v3'
+  - url: "http://localhost:3000/api/v3"
     description: local
 paths:
-  '/channels/{channelId}/messages':
+  "/channels/{channelId}/messages":
     parameters:
-      - $ref: '#/components/parameters/channelIdInPath'
+      - $ref: "#/components/parameters/channelIdInPath"
     post:
       summary: チャンネルにメッセージを投稿
       responses:
-        '201':
+        "201":
           description: Created
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Message'
-        '400':
+                $ref: "#/components/schemas/Message"
+        "400":
           description: Bad Request
-        '404':
+        "404":
           description: |-
             Not Found
             チャンネルが見つかりません。
@@ -46,8 +44,8 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/PostMessageRequest'
-        description: ''
+              $ref: "#/components/schemas/PostMessageRequest"
+        description: ""
       tags:
         - message
         - channel
@@ -59,14 +57,14 @@ paths:
         - channel
         - message
       parameters:
-        - $ref: '#/components/parameters/limitInQuery'
-        - $ref: '#/components/parameters/offsetInQuery'
-        - $ref: '#/components/parameters/sinceInQuery'
-        - $ref: '#/components/parameters/untilInQuery'
-        - $ref: '#/components/parameters/inclusiveInQuery'
-        - $ref: '#/components/parameters/orderInQuery'
+        - $ref: "#/components/parameters/limitInQuery"
+        - $ref: "#/components/parameters/offsetInQuery"
+        - $ref: "#/components/parameters/sinceInQuery"
+        - $ref: "#/components/parameters/untilInQuery"
+        - $ref: "#/components/parameters/inclusiveInQuery"
+        - $ref: "#/components/parameters/orderInQuery"
       responses:
-        '200':
+        "200":
           description: OK
           content:
             application/json:
@@ -74,17 +72,17 @@ paths:
                 type: array
                 description: メッセージの配列
                 items:
-                  $ref: '#/components/schemas/Message'
+                  $ref: "#/components/schemas/Message"
           headers:
             X-TRAQ-MORE:
-              $ref: '#/components/headers/X-TRAQ-MORE'
-        '400':
+              $ref: "#/components/headers/X-TRAQ-MORE"
+        "400":
           description: Bad Request
-        '404':
+        "404":
           description: |-
             Not Found
             チャンネルが見つかりません。
-  '/messages':
+  "/messages":
     get:
       summary: メッセージを検索
       description: メッセージを検索します。
@@ -121,14 +119,18 @@ paths:
           name: in
           description: メッセージが投稿されたチャンネル
         - schema:
-            type: string
-            format: uuid
+            type: array
+            items:
+              type: string
+              format: uuid
           in: query
           name: to
           description: メンションされたユーザー
         - schema:
-            type: string
-            format: uuid
+            type: array
+            items:
+              type: string
+              format: uuid
           in: query
           name: from
           description: メッセージを投稿したユーザー
@@ -186,15 +188,15 @@ paths:
           name: sort
           schema:
             type: string
-            default: '-createdAt'
+            default: "-createdAt"
             enum:
               - createdAt
-              - '-createdAt'
+              - "-createdAt"
               - updatedAt
-              - '-updatedAt'
-          description: 'ソート順 (作成日時が新しい `createdAt`, 作成日時が古い `-createdAt`, 更新日時が新しい `updatedAt`, 更新日時が古い `-updatedAt`)'
+              - "-updatedAt"
+          description: "ソート順 (作成日時が新しい `createdAt`, 作成日時が古い `-createdAt`, 更新日時が新しい `updatedAt`, 更新日時が古い `-updatedAt`)"
       responses:
-        '200':
+        "200":
           description: OK
           content:
             application/json:
@@ -210,47 +212,47 @@ paths:
                   hits:
                     type: array
                     items:
-                      $ref: '#/components/schemas/Message'
+                      $ref: "#/components/schemas/Message"
                     description: 検索にヒットしたメッセージの配列
                 required:
                   - totalHits
                   - hits
-        '400':
+        "400":
           description: Bad Request
-        '503':
+        "503":
           description: search service is currently unavailable
-  '/messages/{messageId}':
+  "/messages/{messageId}":
     parameters:
-      - $ref: '#/components/parameters/messageIdInPath'
+      - $ref: "#/components/parameters/messageIdInPath"
     get:
       summary: メッセージを取得
       tags:
         - message
       responses:
-        '200':
+        "200":
           description: OK
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Message'
-        '404':
+                $ref: "#/components/schemas/Message"
+        "404":
           description: Not Found
       operationId: getMessage
       description: 指定したメッセージを取得します。
     put:
       summary: メッセージを編集
       responses:
-        '204':
+        "204":
           description: |-
             No Content
             メッセージを編集できました。
-        '400':
+        "400":
           description: Bad Request
-        '403':
+        "403":
           description: |-
             Forbidden
             指定されたメッセージを編集する権限がありません。
-        '404':
+        "404":
           description: Not Found
       description: |-
         指定したメッセージを編集します。
@@ -260,22 +262,22 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/PostMessageRequest'
+              $ref: "#/components/schemas/PostMessageRequest"
       tags:
         - message
       operationId: editMessage
     delete:
       summary: メッセージを削除
       responses:
-        '204':
+        "204":
           description: |-
             No Content
             正常に削除できました。
-        '403':
+        "403":
           description: |-
             Forbidden
             指定されたメッセージを削除する権限がありません。
-        '404':
+        "404":
           description: Not Found
       tags:
         - message
@@ -284,22 +286,22 @@ paths:
         指定したメッセージを削除します。
         自身が投稿したメッセージと自身が管理権限を持つWebhookとBOTが投稿したメッセージのみ削除することができます。
         アーカイブされているチャンネルのメッセージを編集することは出来ません。
-  '/messages/{messageId}/pin':
+  "/messages/{messageId}/pin":
     parameters:
-      - $ref: '#/components/parameters/messageIdInPath'
+      - $ref: "#/components/parameters/messageIdInPath"
     get:
       summary: ピン留めを取得
       tags:
         - message
         - pin
       responses:
-        '200':
+        "200":
           description: OK
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/MessagePin'
-        '404':
+                $ref: "#/components/schemas/MessagePin"
+        "404":
           description: |-
             Not Found
             指定したメッセージ、またはピン留めが見つかりません。
@@ -308,17 +310,17 @@ paths:
     post:
       summary: ピン留めする
       responses:
-        '201':
+        "201":
           description: |-
             Created
             指定したメッセージがピン留めされました。
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/MessagePin'
-        '400':
+                $ref: "#/components/schemas/MessagePin"
+        "400":
           description: Bad Request
-        '404':
+        "404":
           description: |-
             Not Found
             メッセージが見つかりません。
@@ -332,13 +334,13 @@ paths:
     delete:
       summary: ピン留めを外す
       responses:
-        '204':
+        "204":
           description: |-
             No Content
             指定したメッセージのピン留めが外されました。
-        '400':
+        "400":
           description: Bad Request
-        '404':
+        "404":
           description: |-
             Not Found
             指定したメッセージ、またはピン留めが見つかりません。
@@ -347,41 +349,42 @@ paths:
         - message
         - pin
       operationId: removePin
-  '/channels/{channelId}/stats':
+  "/channels/{channelId}/stats":
     parameters:
-      - $ref: '#/components/parameters/channelIdInPath'
+      - $ref: "#/components/parameters/channelIdInPath"
+      - $ref: "#/components/parameters/excludeDeletedMessagesInQuery"
     get:
       summary: チャンネル統計情報を取得
       tags:
         - channel
       responses:
-        '200':
+        "200":
           description: OK
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ChannelStats'
-        '404':
+                $ref: "#/components/schemas/ChannelStats"
+        "404":
           description: |-
             Not Found
             チャンネルが見つかりません。
       operationId: getChannelStats
       description: 指定したチャンネルの統計情報を取得します。
-  '/channels/{channelId}/topic':
+  "/channels/{channelId}/topic":
     parameters:
-      - $ref: '#/components/parameters/channelIdInPath'
+      - $ref: "#/components/parameters/channelIdInPath"
     get:
       summary: チャンネルトピックを取得
       tags:
         - channel
       responses:
-        '200':
+        "200":
           description: OK
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ChannelTopic'
-        '404':
+                $ref: "#/components/schemas/ChannelTopic"
+        "404":
           description: |-
             Not Found
             チャンネルが見つかりません。
@@ -390,13 +393,13 @@ paths:
     put:
       summary: チャンネルトピックを編集
       responses:
-        '204':
+        "204":
           description: |-
             No Content
             チャンネルトピックが編集されました
-        '400':
+        "400":
           description: Bad Request
-        '404':
+        "404":
           description: |-
             Not Found
             チャンネルが見つかりません。
@@ -409,17 +412,17 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/PutChannelTopicRequest'
+              $ref: "#/components/schemas/PutChannelTopicRequest"
       operationId: editChannelTopic
-  '/channels/{channelId}/viewers':
+  "/channels/{channelId}/viewers":
     parameters:
-      - $ref: '#/components/parameters/channelIdInPath'
+      - $ref: "#/components/parameters/channelIdInPath"
     get:
       summary: チャンネル閲覧者リストを取得
       tags:
         - channel
       responses:
-        '200':
+        "200":
           description: OK
           content:
             application/json:
@@ -427,8 +430,8 @@ paths:
                 type: array
                 description: チャンネル閲覧者の配列
                 items:
-                  $ref: '#/components/schemas/ChannelViewer'
-        '404':
+                  $ref: "#/components/schemas/ChannelViewer"
+        "404":
           description: |-
             Not Found
             チャンネルが見つかりません。
@@ -438,17 +441,17 @@ paths:
     post:
       summary: ファイルをアップロード
       responses:
-        '201':
+        "201":
           description: Created
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/FileInfo'
-        '400':
+                $ref: "#/components/schemas/FileInfo"
+        "400":
           description: Bad Request
-        '411':
+        "411":
           description: Length Required
-        '413':
+        "413":
           description: Request Entity Too Large
       tags:
         - file
@@ -456,7 +459,7 @@ paths:
         content:
           multipart/form-data:
             schema:
-              $ref: '#/components/schemas/PostFileRequest'
+              $ref: "#/components/schemas/PostFileRequest"
       operationId: postFile
       description: |-
         指定したチャンネルにファイルをアップロードします。
@@ -464,7 +467,7 @@ paths:
     get:
       summary: ファイルメタのリストを取得
       responses:
-        '200':
+        "200":
           description: OK
           content:
             application/json:
@@ -472,11 +475,11 @@ paths:
                 type: array
                 description: ファイルメタの配列
                 items:
-                  $ref: '#/components/schemas/FileInfo'
+                  $ref: "#/components/schemas/FileInfo"
           headers:
             X-TRAQ-MORE:
-              $ref: '#/components/headers/X-TRAQ-MORE'
-        '400':
+              $ref: "#/components/headers/X-TRAQ-MORE"
+        "400":
           description: Bad Request
       tags:
         - file
@@ -488,12 +491,12 @@ paths:
           in: query
           name: channelId
           description: アップロード先チャンネルUUID
-        - $ref: '#/components/parameters/limitInQuery'
-        - $ref: '#/components/parameters/offsetInQuery'
-        - $ref: '#/components/parameters/sinceInQuery'
-        - $ref: '#/components/parameters/untilInQuery'
-        - $ref: '#/components/parameters/inclusiveInQuery'
-        - $ref: '#/components/parameters/orderInQuery'
+        - $ref: "#/components/parameters/limitInQuery"
+        - $ref: "#/components/parameters/offsetInQuery"
+        - $ref: "#/components/parameters/sinceInQuery"
+        - $ref: "#/components/parameters/untilInQuery"
+        - $ref: "#/components/parameters/inclusiveInQuery"
+        - $ref: "#/components/parameters/orderInQuery"
         - schema:
             type: boolean
             default: false
@@ -503,23 +506,23 @@ paths:
       description: |-
         指定したクエリでファイルメタのリストを取得します。
         クエリパラメータ`channelId`, `mine`の少なくともいずれかが必須です。
-  '/files/{fileId}/meta':
+  "/files/{fileId}/meta":
     parameters:
-      - $ref: '#/components/parameters/fileIdInPath'
+      - $ref: "#/components/parameters/fileIdInPath"
     get:
       summary: ファイルメタを取得
       tags:
         - file
       responses:
-        '200':
+        "200":
           description: OK
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/FileInfo'
-        '403':
+                $ref: "#/components/schemas/FileInfo"
+        "403":
           description: Forbidden
-        '404':
+        "404":
           description: |-
             Not Found
             ファイルが見つかりません。
@@ -527,11 +530,11 @@ paths:
       description: |-
         指定したファイルのメタ情報を取得します。
         指定したファイルへのアクセス権限が必要です。
-  '/files/{fileId}/thumbnail':
+  "/files/{fileId}/thumbnail":
     parameters:
-      - $ref: '#/components/parameters/fileIdInPath'
+      - $ref: "#/components/parameters/fileIdInPath"
       - schema:
-          $ref: '#/components/schemas/ThumbnailType'
+          $ref: "#/components/schemas/ThumbnailType"
         in: query
         name: type
         description: 取得するサムネイルのタイプ
@@ -540,7 +543,7 @@ paths:
       tags:
         - file
       responses:
-        '200':
+        "200":
           description: OK
           content:
             image/png:
@@ -551,9 +554,12 @@ paths:
               schema:
                 type: string
                 format: binary
-        '403':
+            image/svg+xml:
+              schema:
+                type: string
+        "403":
           description: Forbidden
-        '404':
+        "404":
           description: |-
             Not Found
             ファイルが見つからない、またはサムネイル画像が存在しません。
@@ -561,15 +567,15 @@ paths:
       description: |-
         指定したファイルのサムネイル画像を取得します。
         指定したファイルへのアクセス権限が必要です。
-  '/files/{fileId}':
+  "/files/{fileId}":
     parameters:
-      - $ref: '#/components/parameters/fileIdInPath'
+      - $ref: "#/components/parameters/fileIdInPath"
     get:
       summary: ファイルをダウンロード
       tags:
         - file
       responses:
-        '200':
+        "200":
           description: |-
             OK
             ファイル本体を返します。
@@ -583,10 +589,10 @@ paths:
             Content-Disposition:
               schema:
                 type: string
-              description: 'https://developer.mozilla.org/ja/docs/Web/HTTP/Headers/Content-Disposition'
-        '403':
+              description: "https://developer.mozilla.org/ja/docs/Web/HTTP/Headers/Content-Disposition"
+        "403":
           description: Forbidden
-        '404':
+        "404":
           description: Not Found
       parameters:
         - schema:
@@ -601,13 +607,13 @@ paths:
     delete:
       summary: ファイルを削除
       responses:
-        '204':
+        "204":
           description: |-
             No Content
             ファイルが削除できました。
-        '403':
+        "403":
           description: Forbidden
-        '404':
+        "404":
           description: Not Found
       tags:
         - file
@@ -615,64 +621,64 @@ paths:
       description: |-
         指定したファイルを削除します。
         指定したファイルの削除権限が必要です。
-  '/channels/{channelId}/pins':
+  "/channels/{channelId}/pins":
     parameters:
-      - $ref: '#/components/parameters/channelIdInPath'
+      - $ref: "#/components/parameters/channelIdInPath"
     get:
       summary: チャンネルピンのリストを取得
       tags:
         - channel
         - pin
       responses:
-        '200':
+        "200":
           description: OK
           content:
             application/json:
               schema:
                 type: array
                 items:
-                  $ref: '#/components/schemas/Pin'
-        '404':
+                  $ref: "#/components/schemas/Pin"
+        "404":
           description: |-
             Not Found
             チャンネルが見つかりません。
       operationId: getChannelPins
       description: 指定したチャンネルにピン留めされているピンメッセージのリストを取得します。
-  '/messages/{messageId}/stamps':
+  "/messages/{messageId}/stamps":
     parameters:
-      - $ref: '#/components/parameters/messageIdInPath'
+      - $ref: "#/components/parameters/messageIdInPath"
     get:
       summary: メッセージのスタンプリストを取得
       tags:
         - message
         - stamp
       responses:
-        '200':
+        "200":
           description: OK
           content:
             application/json:
               schema:
                 type: array
                 items:
-                  $ref: '#/components/schemas/MessageStamp'
-        '404':
+                  $ref: "#/components/schemas/MessageStamp"
+        "404":
           description: Not Found
       description: 指定したメッセージに押されているスタンプのリストを取得します。
       operationId: getMessageStamps
-  '/messages/{messageId}/stamps/{stampId}':
+  "/messages/{messageId}/stamps/{stampId}":
     parameters:
-      - $ref: '#/components/parameters/messageIdInPath'
-      - $ref: '#/components/parameters/stampIdInPath'
+      - $ref: "#/components/parameters/messageIdInPath"
+      - $ref: "#/components/parameters/stampIdInPath"
     post:
       summary: スタンプを押す
       responses:
-        '204':
+        "204":
           description: |-
             No Content
             スタンプを押すことができました。
-        '400':
+        "400":
           description: Bad Request
-        '404':
+        "404":
           description: |-
             Not Found
             メッセージ、またはスタンプが見つかりません。
@@ -684,17 +690,17 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/PostMessageStampRequest'
-        description: ''
+              $ref: "#/components/schemas/PostMessageStampRequest"
+        description: ""
       description: 指定したメッセージに指定したスタンプを押します。
     delete:
       summary: スタンプを消す
       responses:
-        '204':
+        "204":
           description: |-
             No Content
             スタンプを消すことができました。
-        '404':
+        "404":
           description: |-
             Not Found
             メッセージ、またはスタンプが見つかりません。
@@ -703,34 +709,34 @@ paths:
         - message
         - stamp
       description: 指定したメッセージから指定した自身が押したスタンプを削除します。
-  '/stamps/{stampId}':
+  "/stamps/{stampId}":
     parameters:
-      - $ref: '#/components/parameters/stampIdInPath'
+      - $ref: "#/components/parameters/stampIdInPath"
     get:
       summary: スタンプ情報を取得
       tags:
         - stamp
       responses:
-        '200':
+        "200":
           description: OK
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Stamp'
-        '404':
+                $ref: "#/components/schemas/Stamp"
+        "404":
           description: Not Found
       operationId: getStamp
       description: 指定したスタンプの情報を取得します。
     delete:
       summary: スタンプを削除
       responses:
-        '204':
+        "204":
           description: |-
             No Content
             スタンプが削除されました。
-        '403':
+        "403":
           description: Forbidden
-        '404':
+        "404":
           description: Not Found
       description: |-
         指定したスタンプを削除します。
@@ -742,17 +748,17 @@ paths:
       summary: スタンプ情報を変更
       operationId: editStamp
       responses:
-        '204':
+        "204":
           description: |-
             No Content
             スタンプ情報が変更されました。
-        '400':
+        "400":
           description: Bad Request
-        '403':
+        "403":
           description: Forbidden
-        '404':
+        "404":
           description: Not Found
-        '409':
+        "409":
           description: Conflict
       tags:
         - stamp
@@ -761,47 +767,47 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/PatchStampRequest'
+              $ref: "#/components/schemas/PatchStampRequest"
   /stamps:
     post:
       summary: スタンプを作成
       responses:
-        '201':
+        "201":
           description: Created
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Stamp'
-        '400':
+                $ref: "#/components/schemas/Stamp"
+        "400":
           description: Bad Request
-        '409':
+        "409":
           description: Conflict
-        '413':
+        "413":
           description: Request Entity Too Large
       description: スタンプを新規作成します。
       requestBody:
         content:
           multipart/form-data:
             schema:
-              $ref: '#/components/schemas/PostStampRequest'
+              $ref: "#/components/schemas/PostStampRequest"
             encoding:
               file:
-                contentType: 'image/png, image/jpeg, image/gif'
-        description: ''
+                contentType: "image/png, image/jpeg, image/gif, image/svg+xml"
+        description: ""
       operationId: createStamp
       tags:
         - stamp
     get:
       summary: スタンプリストを取得
       responses:
-        '200':
+        "200":
           description: OK
           content:
             application/json:
               schema:
                 type: array
                 items:
-                  $ref: '#/components/schemas/StampWithThumbnail'
+                  $ref: "#/components/schemas/StampWithThumbnail"
       operationId: getStamps
       tags:
         - stamp
@@ -829,14 +835,14 @@ paths:
         - stamp
         - me
       responses:
-        '200':
+        "200":
           description: OK
           content:
             application/json:
               schema:
                 type: array
                 items:
-                  $ref: '#/components/schemas/StampHistoryEntry'
+                  $ref: "#/components/schemas/StampHistoryEntry"
       operationId: getMyStampHistory
       parameters:
         - schema:
@@ -852,13 +858,54 @@ paths:
         結果は降順で返されます。
 
         このAPIが返すスタンプ履歴は厳密な履歴ではありません。
+  /users/me/stamp-recommendations:
+    get:
+      summary: スタンプレコメンドを取得
+      tags:
+        - stamp
+        - me
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    stampId:
+                      type: string
+                      format: uuid
+                      description: スタンプUUID
+                    score:
+                      type: number
+                      format: double
+                      description: レコメンドスコア
+                  required:
+                    - stampId
+                    - score
+      operationId: getMyStampRecommendations
+      parameters:
+        - schema:
+            type: integer
+            default: 100
+            maximum: 200
+            minimum: 1
+          in: query
+          name: limit
+          description: 件数
+      description: |-
+        自分のスタンプレコメンドを最大200件まで取得します。
+        結果は推薦度の高い順で返されます。
+        スタンプを使用したことがないユーザーの場合は空配列が返されます。
   /users/me/qr-code:
     get:
       summary: QRコードを取得
       tags:
         - me
       responses:
-        '200':
+        "200":
           description: OK
           content:
             image/png:
@@ -881,56 +928,56 @@ paths:
           in: query
           name: token
           description: 画像でなくトークン文字列で返すかどうか
-  '/stamps/{stampId}/stats':
+  "/stamps/{stampId}/stats":
     parameters:
-      - $ref: '#/components/parameters/stampIdInPath'
+      - $ref: "#/components/parameters/stampIdInPath"
     get:
       summary: スタンプ統計情報を取得
       tags:
         - stamp
       responses:
-        '200':
+        "200":
           description: OK
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/StampStats'
-        '404':
+                $ref: "#/components/schemas/StampStats"
+        "404":
           description: |-
             Not Found
             スタンプが見つかりません。
       operationId: getStampStats
       description: 指定したスタンプの統計情報を取得します。
-  '/users/{userId}':
+  "/users/{userId}":
     parameters:
-      - $ref: '#/components/parameters/userIdInPath'
+      - $ref: "#/components/parameters/userIdInPath"
     get:
       summary: ユーザー詳細情報を取得
       tags:
         - user
       responses:
-        '200':
+        "200":
           description: OK
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/UserDetail'
-        '404':
+                $ref: "#/components/schemas/UserDetail"
+        "404":
           description: Not Found
       operationId: getUser
       description: 指定したユーザーの詳細情報を取得します。
     patch:
       summary: ユーザー情報を変更
       responses:
-        '204':
+        "204":
           description: |-
             No Content
             変更されました。
-        '400':
+        "400":
           description: Bad Request
-        '403':
+        "403":
           description: Forbidden
-        '404':
+        "404":
           description: Not Found
       operationId: editUser
       tags:
@@ -939,23 +986,23 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/PatchUserRequest'
+              $ref: "#/components/schemas/PatchUserRequest"
       description: |-
         指定したユーザーの情報を変更します。
         管理者権限が必要です。
-  '/groups/{groupId}':
+  "/groups/{groupId}":
     parameters:
-      - $ref: '#/components/parameters/groupIdInPath'
+      - $ref: "#/components/parameters/groupIdInPath"
     get:
       summary: ユーザーグループを取得
       responses:
-        '200':
+        "200":
           description: OK
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/UserGroup'
-        '404':
+                $ref: "#/components/schemas/UserGroup"
+        "404":
           description: Not Found
       operationId: getUserGroup
       tags:
@@ -964,15 +1011,15 @@ paths:
     delete:
       summary: ユーザーグループを削除
       responses:
-        '204':
+        "204":
           description: |-
             No Content
             ユーザーグループが削除されました。
-        '403':
+        "403":
           description: |-
             Forbidden
             ユーザーグループを操作する権限がありません。
-        '404':
+        "404":
           description: Not Found
       description: |-
         指定したユーザーグループを削除します。
@@ -983,19 +1030,19 @@ paths:
     patch:
       summary: ユーザーグループを編集
       responses:
-        '204':
+        "204":
           description: |-
             No Content
             編集されました。
-        '400':
+        "400":
           description: Bad Request
-        '403':
+        "403":
           description: |-
             Forbidden
             ユーザーグループを操作する権限がありません。
-        '404':
+        "404":
           description: Not Found
-        '409':
+        "409":
           description: |-
             Conflict
             変更後のグループ名のグループは既に存在します。
@@ -1006,53 +1053,53 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/PatchUserGroupRequest'
-        description: ''
+              $ref: "#/components/schemas/PatchUserGroupRequest"
+        description: ""
       description: |-
         指定したユーザーグループの情報を編集します。
         対象のユーザーグループの管理者権限が必要です。
-  '/groups/{groupId}/icon':
+  "/groups/{groupId}/icon":
     parameters:
-      - $ref: '#/components/parameters/groupIdInPath'
+      - $ref: "#/components/parameters/groupIdInPath"
     put:
       summary: ユーザーグループのアイコンを変更
       responses:
-        '204':
+        "204":
           description: |-
             No Content
             変更されました。
-        '400':
+        "400":
           description: Bad Request
-        '404':
+        "404":
           description: |-
             Not Found
             ユーザーグループが見つかりません。
-        '413':
+        "413":
           description: Request Entity Too Large
       operationId: changeUserGroupIcon
       requestBody:
         content:
           multipart/form-data:
             schema:
-              $ref: '#/components/schemas/PutUserIconRequest'
+              $ref: "#/components/schemas/PutUserIconRequest"
             encoding:
               file:
-                contentType: 'image/png, image/jpeg, image/gif'
-        description: ''
+                contentType: "image/png, image/jpeg, image/gif"
+        description: ""
       tags:
         - group
       description: |-
         ユーザーグループのアイコンを変更します。
         対象のユーザーグループの管理者権限が必要です。
-  '/groups/{groupId}/members':
+  "/groups/{groupId}/members":
     parameters:
-      - $ref: '#/components/parameters/groupIdInPath'
+      - $ref: "#/components/parameters/groupIdInPath"
     get:
       summary: グループメンバーを取得
       tags:
         - group
       responses:
-        '200':
+        "200":
           description: OK
           content:
             application/json:
@@ -1060,8 +1107,8 @@ paths:
                 type: array
                 description: ユーザーグループメンバーの配列
                 items:
-                  $ref: '#/components/schemas/UserGroupMember'
-        '404':
+                  $ref: "#/components/schemas/UserGroupMember"
+        "404":
           description: |-
             Not Found
             ユーザーグループが見つかりません。
@@ -1070,17 +1117,17 @@ paths:
     post:
       summary: グループメンバーを追加
       responses:
-        '204':
+        "204":
           description: |-
             No Content
             追加されました。
-        '400':
+        "400":
           description: Bad Request
-        '403':
+        "403":
           description: |-
             Forbidden
             ユーザーグループを操作する権限がありません。
-        '404':
+        "404":
           description: |-
             Not Found
             ユーザーグループが見つかりません。
@@ -1088,30 +1135,53 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/UserGroupMember'
-        description: ''
+              oneOf:
+                - $ref: "#/components/schemas/UserGroupMember"
+                - $ref: "#/components/schemas/UserGroupMembers"
+        description: ""
       tags:
         - group
       operationId: addUserGroupMember
       description: |-
         指定したグループにメンバーを追加します。
         対象のユーザーグループの管理者権限が必要です。
-  '/groups/{groupId}/members/{userId}':
-    parameters:
-      - $ref: '#/components/parameters/groupIdInPath'
-      - $ref: '#/components/parameters/userIdInPath'
     delete:
-      summary: グループメンバーを削除
+      summary: グループメンバーを一括削除
       responses:
-        '204':
+        "204":
           description: |-
             No Content
-            指定したユーザーがユーザーグループから削除されました。
-        '403':
+            グループから全てのユーザーが削除されました。
+        "403":
           description: |-
             Forbidden
             ユーザーグループを操作する権限がありません。
-        '404':
+        "404":
+          description: |-
+            Not Found
+            ユーザーグループが見つかりません。
+      tags:
+        - group
+      operationId: removeUserGroupMembers
+      description: |-
+        指定したグループから全てのメンバーを削除します。
+        対象のユーザーグループの管理者権限が必要です。
+  "/groups/{groupId}/members/{userId}":
+    parameters:
+      - $ref: "#/components/parameters/groupIdInPath"
+      - $ref: "#/components/parameters/userIdInPath"
+    delete:
+      summary: グループメンバーを削除
+      responses:
+        "204":
+          description: |-
+            No Content
+            指定したユーザーがユーザーグループから削除されました。
+        "403":
+          description: |-
+            Forbidden
+            ユーザーグループを操作する権限がありません。
+        "404":
           description: |-
             Not Found
             ユーザーグループが見つかりません。
@@ -1125,19 +1195,19 @@ paths:
     patch:
       summary: グループメンバーを編集
       responses:
-        '204':
+        "204":
           description: |-
             No Content
             変更されました。
-        '400':
+        "400":
           description: |-
             Bad Request
             ユーザーがグループに存在しないか、リクエストが不正です。
-        '403':
+        "403":
           description: |-
             Forbidden
             ユーザーグループを操作する権限がありません。
-        '404':
+        "404":
           description: |-
             Not Found
             ユーザーグループが見つかりません。
@@ -1146,7 +1216,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/PatchGroupMemberRequest'
+              $ref: "#/components/schemas/PatchGroupMemberRequest"
       tags:
         - group
       description: |-
@@ -1158,7 +1228,7 @@ paths:
       tags:
         - group
       responses:
-        '200':
+        "200":
           description: OK
           content:
             application/json:
@@ -1166,26 +1236,26 @@ paths:
                 type: array
                 description: ユーザーグループの配列
                 items:
-                  $ref: '#/components/schemas/UserGroup'
+                  $ref: "#/components/schemas/UserGroup"
       description: ユーザーグループのリストを取得します。
       operationId: getUserGroups
       parameters: []
     post:
       summary: ユーザーグループを作成
       responses:
-        '201':
+        "201":
           description: Created
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/UserGroup'
-        '400':
+                $ref: "#/components/schemas/UserGroup"
+        "400":
           description: Bad Request
-        '403':
+        "403":
           description: |-
             Forbidden
             指定したグループを作成する権限がありません。
-        '409':
+        "409":
           description: |-
             Conflict
             指定した名前のグループは既に存在します。
@@ -1199,29 +1269,29 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/PostUserGroupRequest'
+              $ref: "#/components/schemas/PostUserGroupRequest"
   /users/me:
     get:
       summary: 自分のユーザー詳細を取得
       tags:
         - me
       responses:
-        '200':
+        "200":
           description: OK
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/MyUserDetail'
+                $ref: "#/components/schemas/MyUserDetail"
       operationId: getMe
       description: 自身のユーザー詳細情報を取得します。
     patch:
       summary: 自分のユーザー情報を変更
       responses:
-        '204':
+        "204":
           description: |-
             No Content
             変更されました。
-        '400':
+        "400":
           description: Bad Request
       tags:
         - me
@@ -1230,39 +1300,39 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/PatchMeRequest'
+              $ref: "#/components/schemas/PatchMeRequest"
       description: 自身のユーザー情報を変更します。
-  '/users/me/oidc':
+  "/users/me/oidc":
     get:
       summary: 自分のユーザー詳細を取得 (OIDC UserInfo)
       tags:
         - me
       responses:
-        '200':
+        "200":
           description: OK
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/OIDCUserInfo'
+                $ref: "#/components/schemas/OIDCUserInfo"
       operationId: getOIDCUserInfo
       description: |
         OIDCトークンを用いてユーザー詳細を取得します。
         OIDC UserInfo Endpointです。
-  '/users/{userId}/messages':
+  "/users/{userId}/messages":
     parameters:
-      - $ref: '#/components/parameters/userIdInPath'
+      - $ref: "#/components/parameters/userIdInPath"
     post:
       summary: ダイレクトメッセージを送信
       responses:
-        '201':
+        "201":
           description: Created
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Message'
-        '400':
+                $ref: "#/components/schemas/Message"
+        "400":
           description: Bad Request
-        '404':
+        "404":
           description: |-
             Not Found
             ユーザーが見つかりません。
@@ -1274,7 +1344,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/PostMessageRequest'
+              $ref: "#/components/schemas/PostMessageRequest"
       description: 指定したユーザーにダイレクトメッセージを送信します。
     get:
       summary: ダイレクトメッセージのリストを取得
@@ -1283,62 +1353,62 @@ paths:
         - message
         - user
       responses:
-        '200':
+        "200":
           description: OK
           headers:
             X-TRAQ-MORE:
-              $ref: '#/components/headers/X-TRAQ-MORE'
+              $ref: "#/components/headers/X-TRAQ-MORE"
           content:
             application/json:
               schema:
                 type: array
                 description: メッセージの配列
                 items:
-                  $ref: '#/components/schemas/Message'
-        '400':
+                  $ref: "#/components/schemas/Message"
+        "400":
           description: Bad Request
-        '404':
+        "404":
           description: |-
             Not Found
             ユーザーが見つかりません。
       parameters:
-        - $ref: '#/components/parameters/limitInQuery'
-        - $ref: '#/components/parameters/offsetInQuery'
-        - $ref: '#/components/parameters/sinceInQuery'
-        - $ref: '#/components/parameters/untilInQuery'
-        - $ref: '#/components/parameters/inclusiveInQuery'
-        - $ref: '#/components/parameters/orderInQuery'
+        - $ref: "#/components/parameters/limitInQuery"
+        - $ref: "#/components/parameters/offsetInQuery"
+        - $ref: "#/components/parameters/sinceInQuery"
+        - $ref: "#/components/parameters/untilInQuery"
+        - $ref: "#/components/parameters/inclusiveInQuery"
+        - $ref: "#/components/parameters/orderInQuery"
       description: 指定したユーザーとのダイレクトメッセージのリストを取得します。
-  '/users/{userId}/stats':
+  "/users/{userId}/stats":
     parameters:
-      - $ref: '#/components/parameters/userIdInPath'
+      - $ref: "#/components/parameters/userIdInPath"
     get:
       summary: ユーザー統計情報を取得
       tags:
         - user
       responses:
-        '200':
+        "200":
           description: OK
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/UserStats'
-        '404':
+                $ref: "#/components/schemas/UserStats"
+        "404":
           description: |-
             Not Found
             ユーザーが見つかりません。
       operationId: getUserStats
       description: 指定したユーザーの統計情報を取得します。
-  '/channels/{channelId}/subscribers':
+  "/channels/{channelId}/subscribers":
     parameters:
-      - $ref: '#/components/parameters/channelIdInPath'
+      - $ref: "#/components/parameters/channelIdInPath"
     get:
       summary: チャンネルの通知購読者のリストを取得
       tags:
         - channel
         - notification
       responses:
-        '200':
+        "200":
           description: OK
           content:
             application/json:
@@ -1348,11 +1418,11 @@ paths:
                 items:
                   type: string
                   format: uuid
-        '403':
+        "403":
           description: |-
             Forbidden
             プライベートチャンネル・強制通知チャンネルの設定は取得できません。
-        '404':
+        "404":
           description: |-
             Not Found
             チャンネルが見つかりません。
@@ -1361,17 +1431,17 @@ paths:
     patch:
       summary: チャンネルの通知購読者を編集
       responses:
-        '204':
+        "204":
           description: |-
             No Content
             変更できました。
-        '400':
+        "400":
           description: Bad Request
-        '403':
+        "403":
           description: |-
             Forbidden
             指定したチャンネルの通知購読者は変更できません。
-        '404':
+        "404":
           description: |-
             Not Found
             チャンネルが見つかりません。
@@ -1383,8 +1453,8 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/PatchChannelSubscribersRequest'
-        description: ''
+              $ref: "#/components/schemas/PatchChannelSubscribersRequest"
+        description: ""
       description: |-
         指定したチャンネルの通知購読者を編集します。
         リクエストに含めなかったユーザーの通知購読状態は変更しません。
@@ -1392,18 +1462,18 @@ paths:
     put:
       summary: チャンネルの通知購読者を設定
       responses:
-        '204':
+        "204":
           description: |-
             No Content
             変更されました。
           headers: {}
-        '400':
+        "400":
           description: Bad Request
-        '403':
+        "403":
           description: |-
             Forbidden
             指定したチャンネルの通知購読者は変更できません。
-        '404':
+        "404":
           description: |-
             Not Found
             チャンネルが見つかりません。
@@ -1411,7 +1481,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/PutChannelSubscribersRequest'
+              $ref: "#/components/schemas/PutChannelSubscribersRequest"
       description: |-
         指定したチャンネルの通知購読者を設定します。
         リクエストに含めなかったユーザーの通知購読状態はオフになります。
@@ -1427,7 +1497,7 @@ paths:
         - me
         - notification
       responses:
-        '200':
+        "200":
           description: OK
           content:
             application/json:
@@ -1435,26 +1505,26 @@ paths:
                 type: array
                 description: チャンネル購読状態の配列
                 items:
-                  $ref: '#/components/schemas/UserSubscribeState'
+                  $ref: "#/components/schemas/UserSubscribeState"
       operationId: getMyChannelSubscriptions
       description: 自身のチャンネル購読状態を取得します。
-  '/users/me/subscriptions/{channelId}':
+  "/users/me/subscriptions/{channelId}":
     parameters:
-      - $ref: '#/components/parameters/channelIdInPath'
+      - $ref: "#/components/parameters/channelIdInPath"
     put:
       summary: チャンネル購読レベルを設定
       responses:
-        '204':
+        "204":
           description: |-
             No Content
             変更されました。
-        '400':
+        "400":
           description: Bad Request
-        '403':
+        "403":
           description: |-
             Forbidden
             指定したチャンネルの通知購読レベルは変更できません。
-        '404':
+        "404":
           description: |-
             Not Found
             チャンネルが見つかりません。
@@ -1466,13 +1536,13 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/PutChannelSubscribeLevelRequest'
+              $ref: "#/components/schemas/PutChannelSubscribeLevelRequest"
       description: 自身の指定したチャンネルの購読レベルを設定します。
   /webhooks:
     get:
       summary: Webhook情報のリストを取得します
       responses:
-        '200':
+        "200":
           description: OK
           content:
             application/json:
@@ -1480,7 +1550,7 @@ paths:
                 type: array
                 description: Webhook情報の配列
                 items:
-                  $ref: '#/components/schemas/Webhook'
+                  $ref: "#/components/schemas/Webhook"
       tags:
         - webhook
       operationId: getWebhooks
@@ -1497,13 +1567,13 @@ paths:
     post:
       summary: Webhookを新規作成
       responses:
-        '201':
+        "201":
           description: Created
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Webhook'
-        '400':
+                $ref: "#/components/schemas/Webhook"
+        "400":
           description: Bad Request
       operationId: createWebhook
       tags:
@@ -1512,25 +1582,25 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/PostWebhookRequest'
+              $ref: "#/components/schemas/PostWebhookRequest"
       description: |-
         Webhookを新規作成します。
         `secret`が空文字の場合、insecureウェブフックが作成されます。
-  '/webhooks/{webhookId}':
+  "/webhooks/{webhookId}":
     parameters:
-      - $ref: '#/components/parameters/webhookIdInPath'
+      - $ref: "#/components/parameters/webhookIdInPath"
     get:
       summary: Webhook情報を取得
       tags:
         - webhook
       responses:
-        '200':
+        "200":
           description: OK
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Webhook'
-        '404':
+                $ref: "#/components/schemas/Webhook"
+        "404":
           description: |-
             Not Found
             Webhookが見つかりません。
@@ -1539,11 +1609,11 @@ paths:
     post:
       summary: Webhookを送信
       responses:
-        '204':
+        "204":
           description: No Content
-        '400':
+        "400":
           description: Bad Request
-        '404':
+        "404":
           description: Not Found
       operationId: postWebhook
       parameters:
@@ -1569,7 +1639,7 @@ paths:
             schema:
               type: string
               description: メッセージ文字列
-        description: ''
+        description: ""
       tags:
         - webhook
       description: |-
@@ -1579,11 +1649,11 @@ paths:
     delete:
       summary: Webhookを削除
       responses:
-        '204':
+        "204":
           description: |-
             No Content
             削除されました。
-        '404':
+        "404":
           description: |-
             Not Found
             Webhookが見つかりません。
@@ -1596,13 +1666,13 @@ paths:
     patch:
       summary: Webhook情報を変更
       responses:
-        '204':
+        "204":
           description: |-
             No Content
             編集できました。
-        '400':
+        "400":
           description: Bad Request
-        '404':
+        "404":
           description: |-
             Not Found
             Webhookが見つかりません。
@@ -1611,19 +1681,19 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/PatchWebhookRequest'
+              $ref: "#/components/schemas/PatchWebhookRequest"
       tags:
         - webhook
       description: 指定したWebhookの情報を変更します。
-  '/webhooks/{webhookId}/icon':
+  "/webhooks/{webhookId}/icon":
     parameters:
-      - $ref: '#/components/parameters/webhookIdInPath'
+      - $ref: "#/components/parameters/webhookIdInPath"
     get:
       summary: Webhookのアイコンを取得
       tags:
         - webhook
       responses:
-        '200':
+        "200":
           description: OK
           content:
             image/jpeg:
@@ -1638,7 +1708,7 @@ paths:
               schema:
                 type: string
                 format: binary
-        '404':
+        "404":
           description: |-
             Not Found
             Webhookが見つかりません。
@@ -1647,40 +1717,40 @@ paths:
     put:
       summary: Webhookのアイコンを変更
       responses:
-        '204':
+        "204":
           description: |-
             No Content
             変更されました。
-        '400':
+        "400":
           description: Bad Request
-        '404':
+        "404":
           description: |-
             Not Found
             Webhookが見つかりません。
-        '413':
+        "413":
           description: Request Entity Too Large
       operationId: changeWebhookIcon
       requestBody:
         content:
           multipart/form-data:
             schema:
-              $ref: '#/components/schemas/PutUserIconRequest'
+              $ref: "#/components/schemas/PutUserIconRequest"
             encoding:
               file:
-                contentType: 'image/png, image/jpeg, image/gif'
-        description: ''
+                contentType: "image/png, image/jpeg, image/gif"
+        description: ""
       tags:
         - webhook
       description: 指定したWebhookのアイコン画像を変更します。
-  '/users/{userId}/icon':
+  "/users/{userId}/icon":
     parameters:
-      - $ref: '#/components/parameters/userIdInPath'
+      - $ref: "#/components/parameters/userIdInPath"
     get:
       summary: ユーザーのアイコン画像を取得
       tags:
         - user
       responses:
-        '200':
+        "200":
           description: OK
           content:
             image/jpeg:
@@ -1695,7 +1765,7 @@ paths:
               schema:
                 type: string
                 format: binary
-        '404':
+        "404":
           description: |-
             Not Found
             ユーザーが見つかりません。
@@ -1704,29 +1774,29 @@ paths:
     put:
       summary: ユーザーのアイコン画像を変更します
       responses:
-        '204':
+        "204":
           description: |-
             No Content
             変更されました。
-        '400':
+        "400":
           description: Bad Request
-        '403':
+        "403":
           description: Forbidden
-        '404':
+        "404":
           description: |-
             Not Found
             ユーザーが見つかりません。
-        '413':
+        "413":
           description: Request Entity Too Large
       operationId: changeUserIcon
       requestBody:
         content:
           multipart/form-data:
             schema:
-              $ref: '#/components/schemas/PutUserIconRequest'
+              $ref: "#/components/schemas/PutUserIconRequest"
             encoding:
               file:
-                contentType: 'image/png, image/jpeg, image/gif'
+                contentType: "image/png, image/jpeg, image/gif"
       tags:
         - user
       description: |-
@@ -1738,7 +1808,7 @@ paths:
       tags:
         - me
       responses:
-        '200':
+        "200":
           description: OK
           content:
             image/jpeg:
@@ -1753,7 +1823,7 @@ paths:
               schema:
                 type: string
                 format: binary
-        '404':
+        "404":
           description: |-
             Not Found
             ユーザーが見つかりません。
@@ -1762,13 +1832,13 @@ paths:
     put:
       summary: 自分のアイコン画像を変更
       responses:
-        '204':
+        "204":
           description: |-
             No Content
             変更されました。
-        '400':
+        "400":
           description: Bad Request
-        '413':
+        "413":
           description: Request Entity Too Large
       description: 自分のアイコン画像を変更します。
       operationId: changeMyIcon
@@ -1776,23 +1846,23 @@ paths:
         content:
           multipart/form-data:
             schema:
-              $ref: '#/components/schemas/PutUserIconRequest'
+              $ref: "#/components/schemas/PutUserIconRequest"
             encoding:
               file:
-                contentType: 'image/png, image/jpeg, image/gif'
+                contentType: "image/png, image/jpeg, image/gif"
       tags:
         - me
   /users/me/password:
     put:
       summary: 自分のパスワードを変更
       responses:
-        '204':
+        "204":
           description: |-
             No Content
             変更できました。
-        '400':
+        "400":
           description: Bad Request
-        '401':
+        "401":
           description: |-
             Unauthorized
             現在のパスワードが違います。
@@ -1803,24 +1873,24 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/PutMyPasswordRequest'
-        description: ''
+              $ref: "#/components/schemas/PutMyPasswordRequest"
+        description: ""
       description: 自身のパスワードを変更します。
-  '/users/{userId}/password':
+  "/users/{userId}/password":
     parameters:
-      - $ref: '#/components/parameters/userIdInPath'
+      - $ref: "#/components/parameters/userIdInPath"
     put:
       summary: ユーザーのパスワードを変更
       responses:
-        '204':
+        "204":
           description: |-
             No Content
             変更できました。
-        '400':
+        "400":
           description: Bad Request
-        '403':
+        "403":
           description: Forbidden
-        '404':
+        "404":
           description: |-
             Not Found
             ユーザーが見つかりません。
@@ -1828,8 +1898,8 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/PutUserPasswordRequest'
-        description: ''
+              $ref: "#/components/schemas/PutUserPasswordRequest"
+        description: ""
       tags:
         - user
       operationId: changeUserPassword
@@ -1840,11 +1910,11 @@ paths:
     post:
       summary: FCMデバイスを登録
       responses:
-        '204':
+        "204":
           description: |-
             No Content
             登録できました。
-        '400':
+        "400":
           description: Bad Request
       tags:
         - me
@@ -1855,12 +1925,12 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/PostMyFCMDeviceRequest'
+              $ref: "#/components/schemas/PostMyFCMDeviceRequest"
   /users/me/view-states:
     get:
       summary: 自身のチャンネル閲覧状態一覧を取得
       responses:
-        '200':
+        "200":
           description: OK
           content:
             application/json:
@@ -1868,7 +1938,7 @@ paths:
                 type: array
                 description: チャンネル閲覧状態
                 items:
-                  $ref: '#/components/schemas/MyChannelViewState'
+                  $ref: "#/components/schemas/MyChannelViewState"
       operationId: getMyViewStates
       tags:
         - me
@@ -1878,17 +1948,17 @@ paths:
     post:
       summary: ユーザーを登録
       responses:
-        '201':
+        "201":
           description: Created
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/UserDetail'
-        '400':
+                $ref: "#/components/schemas/UserDetail"
+        "400":
           description: Bad Request
-        '403':
+        "403":
           description: Forbidden
-        '409':
+        "409":
           description: |-
             Conflict
             nameが重複しています。
@@ -1899,15 +1969,15 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/PostUserRequest'
-        description: ''
+              $ref: "#/components/schemas/PostUserRequest"
+        description: ""
       description: |-
         ユーザーを登録します。
         管理者権限が必要です。
     get:
       summary: ユーザーのリストを取得
       responses:
-        '200':
+        "200":
           description: OK
           content:
             application/json:
@@ -1915,8 +1985,8 @@ paths:
                 type: array
                 description: ユーザー情報の配列
                 items:
-                  $ref: '#/components/schemas/User'
-        '400':
+                  $ref: "#/components/schemas/User"
+        "400":
           description: Bad Request
       operationId: getUsers
       tags:
@@ -1941,17 +2011,17 @@ paths:
     post:
       summary: チャンネルを作成
       responses:
-        '201':
+        "201":
           description: Created
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Channel'
-        '400':
+                $ref: "#/components/schemas/Channel"
+        "400":
           description: Bad Request
-        '403':
+        "403":
           description: Forbidden
-        '409':
+        "409":
           description: |-
             Conflict
             指定した名前のチャンネルは既に存在しています。
@@ -1962,19 +2032,19 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/PostChannelRequest'
+              $ref: "#/components/schemas/PostChannelRequest"
       description: |-
         チャンネルを作成します。
         階層が6以上になるチャンネルは作成できません。
     get:
       summary: チャンネルリストを取得
       responses:
-        '200':
+        "200":
           description: OK
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ChannelList'
+                $ref: "#/components/schemas/ChannelList"
       operationId: getChannels
       tags:
         - channel
@@ -1991,16 +2061,16 @@ paths:
           in: query
           name: path
           description: パスが一致するチャンネルのみを取得する
-  '/users/{userId}/tags':
+  "/users/{userId}/tags":
     parameters:
-      - $ref: '#/components/parameters/userIdInPath'
+      - $ref: "#/components/parameters/userIdInPath"
     get:
       summary: ユーザーのタグリストを取得
       tags:
         - user
         - user tag
       responses:
-        '200':
+        "200":
           description: OK
           content:
             application/json:
@@ -2008,8 +2078,8 @@ paths:
                 type: array
                 description: ユーザータグの配列
                 items:
-                  $ref: '#/components/schemas/UserTag'
-        '404':
+                  $ref: "#/components/schemas/UserTag"
+        "404":
           description: |-
             Not Found
             ユーザーが見つかりません。
@@ -2018,21 +2088,21 @@ paths:
     post:
       summary: ユーザーにタグを追加
       responses:
-        '201':
+        "201":
           description: Created
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/UserTag'
-        '400':
+                $ref: "#/components/schemas/UserTag"
+        "400":
           description: Bad Request
-        '403':
+        "403":
           description: Forbidden
-        '404':
+        "404":
           description: |-
             Not Found
             ユーザーが見つかりません。
-        '409':
+        "409":
           description: |-
             Conflict
             既に追加されています。
@@ -2044,25 +2114,25 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/PostUserTagRequest'
-        description: ''
+              $ref: "#/components/schemas/PostUserTagRequest"
+        description: ""
       description: |-
         指定したユーザーに指定したタグを追加します。
         Webhookユーザーにタグを追加することは出来ません。
-  '/users/{userId}/tags/{tagId}':
+  "/users/{userId}/tags/{tagId}":
     parameters:
-      - $ref: '#/components/parameters/userIdInPath'
-      - $ref: '#/components/parameters/tagIdInPath'
+      - $ref: "#/components/parameters/userIdInPath"
+      - $ref: "#/components/parameters/tagIdInPath"
     patch:
       summary: ユーザーのタグを編集
       responses:
-        '204':
+        "204":
           description: |-
             No Content
             変更されました。
-        '400':
+        "400":
           description: Bad Request
-        '404':
+        "404":
           description: |-
             Not Found
             ユーザーか、タグが見つかりません。
@@ -2071,8 +2141,8 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/PatchUserTagRequest'
-        description: ''
+              $ref: "#/components/schemas/PatchUserTagRequest"
+        description: ""
       tags:
         - user
         - user tag
@@ -2082,15 +2152,15 @@ paths:
     delete:
       summary: ユーザーからタグを削除します
       responses:
-        '204':
+        "204":
           description: |-
             No Content
             削除されました。
-        '403':
+        "403":
           description: |-
             Forbidden
             タグがロックされていました。
-        '404':
+        "404":
           description: |-
             Not Found
             ユーザーが見つかりません。
@@ -2099,19 +2169,19 @@ paths:
       tags:
         - user
         - user tag
-  '/tags/{tagId}':
+  "/tags/{tagId}":
     parameters:
-      - $ref: '#/components/parameters/tagIdInPath'
+      - $ref: "#/components/parameters/tagIdInPath"
     get:
       summary: タグ情報を取得
       responses:
-        '200':
+        "200":
           description: OK
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Tag'
-        '404':
+                $ref: "#/components/schemas/Tag"
+        "404":
           description: Not Found
       operationId: getTag
       tags:
@@ -2124,7 +2194,7 @@ paths:
         - me
         - user tag
       responses:
-        '200':
+        "200":
           description: OK
           content:
             application/json:
@@ -2132,21 +2202,21 @@ paths:
                 type: array
                 description: ユーザータグの配列
                 items:
-                  $ref: '#/components/schemas/UserTag'
+                  $ref: "#/components/schemas/UserTag"
       operationId: getMyUserTags
       description: 自分に付けられているタグの配列を取得します。
     post:
       summary: 自分にタグを追加
       responses:
-        '201':
+        "201":
           description: Created
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/UserTag'
-        '400':
+                $ref: "#/components/schemas/UserTag"
+        "400":
           description: Bad Request
-        '409':
+        "409":
           description: |-
             Conflict
             既に追加されています。
@@ -2158,20 +2228,20 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/PostUserTagRequest'
-        description: ''
+              $ref: "#/components/schemas/PostUserTagRequest"
+        description: ""
       description: 自分に新しくタグを追加します。
-  '/users/me/tags/{tagId}':
+  "/users/me/tags/{tagId}":
     parameters:
-      - $ref: '#/components/parameters/tagIdInPath'
+      - $ref: "#/components/parameters/tagIdInPath"
     delete:
       summary: 自分からタグを削除します
       responses:
-        '204':
+        "204":
           description: |-
             No Content
             削除されました。
-        '403':
+        "403":
           description: |-
             Forbidden
             タグがロックされています。
@@ -2183,13 +2253,13 @@ paths:
     patch:
       summary: 自分のタグを編集
       responses:
-        '204':
+        "204":
           description: |-
             No Content
             変更されました。
-        '400':
+        "400":
           description: Bad Request
-        '404':
+        "404":
           description: |-
             Not Found
             タグが見つかりません。
@@ -2198,8 +2268,8 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/PatchUserTagRequest'
-        description: ''
+              $ref: "#/components/schemas/PatchUserTagRequest"
+        description: ""
       tags:
         - user tag
         - me
@@ -2211,7 +2281,7 @@ paths:
         - me
         - star
       responses:
-        '200':
+        "200":
           description: OK
           content:
             application/json:
@@ -2226,11 +2296,11 @@ paths:
     post:
       summary: チャンネルをスターに追加
       responses:
-        '204':
+        "204":
           description: |-
             No Content
             スターしました。
-        '400':
+        "400":
           description: Bad Request
       tags:
         - me
@@ -2240,18 +2310,18 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/PostStarRequest'
+              $ref: "#/components/schemas/PostStarRequest"
       description: |-
         指定したチャンネルをスターチャンネルに追加します。
         スター済みのチャンネルIDを指定した場合、204を返します。
         不正なチャンネルIDを指定した場合、400を返します。
-  '/users/me/stars/{channelId}':
+  "/users/me/stars/{channelId}":
     parameters:
-      - $ref: '#/components/parameters/channelIdInPath'
+      - $ref: "#/components/parameters/channelIdInPath"
     delete:
       summary: チャンネルをスターから削除します
       responses:
-        '204':
+        "204":
           description: |-
             No Content
             削除されました。
@@ -2267,7 +2337,7 @@ paths:
         - me
         - notification
       responses:
-        '200':
+        "200":
           description: OK
           content:
             application/json:
@@ -2275,7 +2345,7 @@ paths:
                 type: array
                 description: 未読チャンネル情報の配列
                 items:
-                  $ref: '#/components/schemas/UnreadChannel'
+                  $ref: "#/components/schemas/UnreadChannel"
       operationId: getMyUnreadChannels
       description: 自分が現在未読のチャンネルの未読情報を取得します。
   /version:
@@ -2284,33 +2354,33 @@ paths:
       tags:
         - public
       responses:
-        '200':
+        "200":
           description: OK
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Version'
+                $ref: "#/components/schemas/Version"
       operationId: getServerVersion
       description: サーバーバージョン及びサーバーフラグ情報を取得します。
   /login:
     post:
       summary: ログイン
       responses:
-        '204':
+        "204":
           description: |-
             No Content
             ログインしました。
-        '302':
+        "302":
           description: |-
             Found
             ログインしました。リダイレクトします。
-        '400':
+        "400":
           description: Bad Request
-        '401':
+        "401":
           description: |-
             Unauthorized
             認証情報が間違っています。
-        '403':
+        "403":
           description: |-
             Forbidden
             ログインを試行したユーザーアカウントに問題があります。
@@ -2318,22 +2388,22 @@ paths:
         - authentication
       operationId: login
       parameters:
-        - $ref: '#/components/parameters/redirectInQuery'
+        - $ref: "#/components/parameters/redirectInQuery"
       requestBody:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/PostLoginRequest'
+              $ref: "#/components/schemas/PostLoginRequest"
       description: ログインします。
   /logout:
     post:
       summary: ログアウト
       responses:
-        '204':
+        "204":
           description: |-
             No Content
             ログアウトしました。
-        '302':
+        "302":
           description: |-
             Found
             ログアウトしました。リダイレクトします。
@@ -2341,7 +2411,7 @@ paths:
         - authentication
       operationId: logout
       parameters:
-        - $ref: '#/components/parameters/redirectInQuery'
+        - $ref: "#/components/parameters/redirectInQuery"
         - schema:
             type: boolean
             default: false
@@ -2356,7 +2426,7 @@ paths:
         - authentication
         - me
       responses:
-        '200':
+        "200":
           description: OK
           content:
             application/json:
@@ -2364,16 +2434,16 @@ paths:
                 type: array
                 description: 有効なログインセッションの配列
                 items:
-                  $ref: '#/components/schemas/LoginSession'
+                  $ref: "#/components/schemas/LoginSession"
       operationId: getMySessions
       description: 自分のログインセッションのリストを取得します。
-  '/users/me/sessions/{sessionId}':
+  "/users/me/sessions/{sessionId}":
     parameters:
-      - $ref: '#/components/parameters/sessionIdInPath'
+      - $ref: "#/components/parameters/sessionIdInPath"
     delete:
       summary: セッションを無効化
       responses:
-        '204':
+        "204":
           description: |-
             No Content
             無効化しました。
@@ -2390,7 +2460,7 @@ paths:
       tags:
         - activity
       responses:
-        '200':
+        "200":
           description: OK
           content:
             application/json:
@@ -2398,8 +2468,8 @@ paths:
                 type: array
                 description: メッセージの配列
                 items:
-                  $ref: '#/components/schemas/ActivityTimelineMessage'
-        '400':
+                  $ref: "#/components/schemas/ActivityTimelineMessage"
+        "400":
           description: Bad Request
       description: |-
         パブリックチャンネルの直近の投稿メッセージを作成日時の降順で取得します。
@@ -2432,7 +2502,7 @@ paths:
       tags:
         - notification
       responses:
-        '101':
+        "101":
           description: Switching Protocols
       operationId: ws
       description: |-
@@ -2757,6 +2827,40 @@ paths:
 
         + `folder_id`: メッセージが追加されたクリップフォルダーのId
         + `message_id`: クリップフォルダーに追加されたメッセージのId
+
+        ### `QALL_ROOM_STATE_CHANGED`
+        ルーム状態が変更された。
+
+        対象: 全員
+
+        + `room_id`: 変更されたルームのId
+        + `state`: 変更後のルーム状態
+          + `roomId`: ルームのID
+          + `participants`: ルーム内の参加者(配列)
+            + `identity`: ユーザーID_RandomUUID
+            + `name`: 表示名
+            + `joinedAt`: 参加した時刻
+            + `attributes`: ユーザーに関連付けられたカスタム属性
+            + `canPublish`: 発言権限
+          + `isWebinar`: ウェビナールームかどうか
+          + `metadata`: ルームに関連付けられたカスタム属性
+
+        ### `QALL_SOUNDBOARD_ITEM_CREATED`
+        サウンドボードアイテムが作成された。
+
+        対象: 全員
+
+        + `sound_id`: 作成されたサウンドのId
+        + `name`: サウンド名
+        + `creator_id`: 作成者のId
+
+        ### `QALL_SOUNDBOARD_ITEM_DELETED`
+        サウンドボードアイテムが削除された。
+
+        対象: 全員
+
+        + `sound_id`: 削除されたサウンドのId
+
   /users/me/tokens:
     get:
       summary: 有効トークンのリストを取得
@@ -2764,7 +2868,7 @@ paths:
         - oauth2
         - me
       responses:
-        '200':
+        "200":
           description: OK
           content:
             application/json:
@@ -2772,27 +2876,27 @@ paths:
                 type: array
                 description: トークン情報の配列
                 items:
-                  $ref: '#/components/schemas/ActiveOAuth2Token'
+                  $ref: "#/components/schemas/ActiveOAuth2Token"
       operationId: getMyTokens
       description: 有効な自分に発行されたOAuth2トークンのリストを取得します。
-  '/users/me/tokens/{tokenId}':
+  "/users/me/tokens/{tokenId}":
     parameters:
-      - $ref: '#/components/parameters/tokenIdInPath'
+      - $ref: "#/components/parameters/tokenIdInPath"
     delete:
       summary: トークンの認可を取り消す
       responses:
-        '204':
+        "204":
           description: |-
             No Content
             取り消しました。
-        '404':
+        "404":
           description: Not Found
       operationId: revokeMyToken
       description: 自分の指定したトークンの認可を取り消します。
       tags:
         - oauth2
         - me
-  '/public/icon/{username}':
+  "/public/icon/{username}":
     parameters:
       - name: username
         in: path
@@ -2800,13 +2904,13 @@ paths:
         description: ユーザー名
         schema:
           type: string
-          pattern: '^[a-zA-Z0-9_-]{1,32}$'
+          pattern: "^([a-zA-Z0-9_-]{1,32}|Webhook#[a-zA-Z0-9_-]{22})$"
     get:
       summary: ユーザーのアイコン画像を取得
       tags:
         - public
       responses:
-        '200':
+        "200":
           description: OK
           content:
             image/jpeg:
@@ -2821,29 +2925,29 @@ paths:
               schema:
                 type: string
                 format: binary
-        '404':
+        "404":
           description: Not Found
       operationId: getPublicUserIcon
       description: ユーザーのアイコン画像を取得します。
-  '/clients/{clientId}':
+  "/clients/{clientId}":
     parameters:
-      - $ref: '#/components/parameters/clientIdInPath'
+      - $ref: "#/components/parameters/clientIdInPath"
     get:
       summary: OAuth2クライアント情報を取得
       tags:
         - oauth2
       responses:
-        '200':
+        "200":
           description: OK
           content:
             application/json:
               schema:
                 oneOf:
-                  - $ref: '#/components/schemas/OAuth2Client'
-                  - $ref: '#/components/schemas/OAuth2ClientDetail'
-        '403':
+                  - $ref: "#/components/schemas/OAuth2Client"
+                  - $ref: "#/components/schemas/OAuth2ClientDetail"
+        "403":
           description: Forbidden
-        '404':
+        "404":
           description: Not Found
       operationId: getClient
       parameters:
@@ -2859,13 +2963,13 @@ paths:
     delete:
       summary: OAuth2クライアントを削除
       responses:
-        '204':
+        "204":
           description: |-
             No Content
             削除されました。
-        '403':
+        "403":
           description: Forbidden
-        '404':
+        "404":
           description: |-
             Not Found
             OAuth2クライアントが見つかりません。
@@ -2878,15 +2982,15 @@ paths:
     patch:
       summary: OAuth2クライアント情報を変更
       responses:
-        '204':
+        "204":
           description: |-
             No Content
             変更できました。
-        '400':
+        "400":
           description: Bad Request
-        '403':
+        "403":
           description: Forbidden
-        '404':
+        "404":
           description: |-
             Not Found
             OAuth2クライアントが見つかりません。
@@ -2897,23 +3001,23 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/PatchClientRequest'
-        description: ''
+              $ref: "#/components/schemas/PatchClientRequest"
+        description: ""
       description: |-
         指定したOAuth2クライアントの情報を変更します。
         対象のクライアントの管理権限が必要です。
         クライアント開発者UUIDを変更した場合は、変更先ユーザーにクライアント管理権限が移譲され、自分自身は権限を失います。
-  '/clients/{clientId}/tokens':
+  "/clients/{clientId}/tokens":
     delete:
       summary: OAuthクライアントのトークンを削除
       parameters:
-        - $ref: '#/components/parameters/clientIdInPath'
+        - $ref: "#/components/parameters/clientIdInPath"
       responses:
-        '204':
+        "204":
           description: |-
             No Content
             削除できました。
-        '404':
+        "404":
           description: |-
             Not Found
             OAuth2クライアントが見つかりません。
@@ -2928,7 +3032,7 @@ paths:
       tags:
         - oauth2
       responses:
-        '200':
+        "200":
           description: OK
           content:
             application/json:
@@ -2936,7 +3040,7 @@ paths:
                 type: array
                 description: OAuth2クライアント情報の配列
                 items:
-                  $ref: '#/components/schemas/OAuth2Client'
+                  $ref: "#/components/schemas/OAuth2Client"
       operationId: getClients
       parameters:
         - schema:
@@ -2951,13 +3055,13 @@ paths:
     post:
       summary: OAuth2クライアントを作成
       responses:
-        '201':
+        "201":
           description: Created
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/OAuth2ClientDetail'
-        '400':
+                $ref: "#/components/schemas/OAuth2ClientDetail"
+        "400":
           description: Bad Request
       tags:
         - oauth2
@@ -2967,20 +3071,20 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/PostClientRequest'
+              $ref: "#/components/schemas/PostClientRequest"
   /bots:
     post:
       summary: BOTを作成
       responses:
-        '201':
+        "201":
           description: Created
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/BotDetail'
-        '400':
+                $ref: "#/components/schemas/BotDetail"
+        "400":
           description: Bad Request
-        '409':
+        "409":
           description: |-
             Conflict
             既に使われている名前です。
@@ -2995,11 +3099,11 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/PostBotRequest'
+              $ref: "#/components/schemas/PostBotRequest"
     get:
       summary: BOTリストを取得
       responses:
-        '200':
+        "200":
           description: OK
           content:
             application/json:
@@ -3007,7 +3111,7 @@ paths:
                 type: array
                 description: BOT情報の配列
                 items:
-                  $ref: '#/components/schemas/Bot'
+                  $ref: "#/components/schemas/Bot"
       operationId: getBots
       parameters:
         - schema:
@@ -3026,7 +3130,7 @@ paths:
       tags:
         - bot
       responses:
-        '101':
+        "101":
           description: Switching Protocols
       operationId: connectBotWS
       summary: WebSocket Mode BOT用通知ストリームに接続します
@@ -3066,13 +3170,13 @@ paths:
 
         `{"type":"ERROR","body":"message"}`
 
-  '/bots/{botId}/icon':
+  "/bots/{botId}/icon":
     parameters:
-      - $ref: '#/components/parameters/botIdInPath'
+      - $ref: "#/components/parameters/botIdInPath"
     get:
       summary: BOTのアイコン画像を取得
       responses:
-        '200':
+        "200":
           description: OK
           content:
             image/jpeg:
@@ -3087,7 +3191,7 @@ paths:
               schema:
                 type: string
                 format: binary
-        '404':
+        "404":
           description: |-
             Not Found
             BOTが見つかりません。
@@ -3098,53 +3202,53 @@ paths:
     put:
       summary: BOTのアイコン画像を変更
       responses:
-        '204':
+        "204":
           description: |-
             No Content
             変更されました。
-        '400':
+        "400":
           description: Bad Request
-        '403':
+        "403":
           description: Forbidden
-        '404':
+        "404":
           description: |-
             Not Found
             BOTが見つかりません。
-        '413':
+        "413":
           description: Request Entity Too Large
       operationId: changeBotIcon
       requestBody:
         content:
           multipart/form-data:
             schema:
-              $ref: '#/components/schemas/PutUserIconRequest'
+              $ref: "#/components/schemas/PutUserIconRequest"
             encoding:
               file:
-                contentType: 'image/png, image/jpeg, image/gif'
+                contentType: "image/png, image/jpeg, image/gif"
       tags:
         - bot
       description: |-
         指定したBOTのアイコン画像を変更を変更します。
         対象のBOTの管理権限が必要です。
-  '/bots/{botId}':
+  "/bots/{botId}":
     parameters:
-      - $ref: '#/components/parameters/botIdInPath'
+      - $ref: "#/components/parameters/botIdInPath"
     get:
       summary: BOT情報を取得
       tags:
         - bot
       responses:
-        '200':
+        "200":
           description: OK
           content:
             application/json:
               schema:
                 oneOf:
-                  - $ref: '#/components/schemas/Bot'
-                  - $ref: '#/components/schemas/BotDetail'
-        '403':
+                  - $ref: "#/components/schemas/Bot"
+                  - $ref: "#/components/schemas/BotDetail"
+        "403":
           description: Forbidden
-        '404':
+        "404":
           description: Not Found
       operationId: getBot
       parameters:
@@ -3160,13 +3264,13 @@ paths:
     delete:
       summary: BOTを削除
       responses:
-        '204':
+        "204":
           description: |-
             No Content
             削除しました。
-        '403':
+        "403":
           description: Forbidden
-        '404':
+        "404":
           description: Not Found
       operationId: deleteBot
       tags:
@@ -3177,15 +3281,15 @@ paths:
     patch:
       summary: BOT情報を変更
       responses:
-        '204':
+        "204":
           description: |-
             No Content
             変更しました。
-        '400':
+        "400":
           description: Bad Request
-        '403':
+        "403":
           description: Forbidden
-        '404':
+        "404":
           description: Not Found
       operationId: editBot
       description: |-
@@ -3198,19 +3302,19 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/PatchBotRequest'
-        description: ''
-  '/bots/{botId}/actions/activate':
+              $ref: "#/components/schemas/PatchBotRequest"
+        description: ""
+  "/bots/{botId}/actions/activate":
     parameters:
-      - $ref: '#/components/parameters/botIdInPath'
+      - $ref: "#/components/parameters/botIdInPath"
     post:
       summary: BOTをアクティベート
       responses:
-        '202':
+        "202":
           description: Accepted
-        '403':
+        "403":
           description: Forbidden
-        '404':
+        "404":
           description: |-
             Not Found
             BOTが見つかりません。
@@ -3220,19 +3324,19 @@ paths:
       description: |-
         指定したBOTを有効化します。
         対象のBOTの管理権限が必要です。
-  '/bots/{botId}/actions/inactivate':
+  "/bots/{botId}/actions/inactivate":
     parameters:
-      - $ref: '#/components/parameters/botIdInPath'
+      - $ref: "#/components/parameters/botIdInPath"
     post:
       summary: BOTをインアクティベート
       responses:
-        '204':
+        "204":
           description: |-
             No Content
             BOTがインアクティベートされました。
-        '403':
+        "403":
           description: Forbidden
-        '404':
+        "404":
           description: |-
             Not Found
             BOTが見つかりません。
@@ -3240,21 +3344,21 @@ paths:
         - bot
       operationId: inactivateBot
       description: 指定したBOTを無効化します。対象のBOTの管理権限が必要です。
-  '/bots/{botId}/actions/reissue':
+  "/bots/{botId}/actions/reissue":
     parameters:
-      - $ref: '#/components/parameters/botIdInPath'
+      - $ref: "#/components/parameters/botIdInPath"
     post:
       summary: BOTのトークンを再発行
       responses:
-        '200':
+        "200":
           description: OK
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/BotTokens'
-        '403':
+                $ref: "#/components/schemas/BotTokens"
+        "403":
           description: Forbidden
-        '404':
+        "404":
           description: |-
             Not Found
             BOTが見つかりません。
@@ -3264,15 +3368,15 @@ paths:
       description: |-
         指定したBOTの現在の各種トークンを無効化し、再発行を行います。
         対象のBOTの管理権限が必要です。
-  '/bots/{botId}/logs':
+  "/bots/{botId}/logs":
     parameters:
-      - $ref: '#/components/parameters/botIdInPath'
+      - $ref: "#/components/parameters/botIdInPath"
     get:
       summary: BOTのイベントログを取得
       tags:
         - bot
       responses:
-        '200':
+        "200":
           description: OK
           content:
             application/json:
@@ -3280,35 +3384,35 @@ paths:
                 type: array
                 description: イベントログの配列
                 items:
-                  $ref: '#/components/schemas/BotEventLog'
-        '403':
+                  $ref: "#/components/schemas/BotEventLog"
+        "403":
           description: Forbidden
-        '404':
+        "404":
           description: |-
             Not Found
             BOTが見つかりません。
       operationId: getBotLogs
       parameters:
-        - $ref: '#/components/parameters/limitInQuery'
-        - $ref: '#/components/parameters/offsetInQuery'
+        - $ref: "#/components/parameters/limitInQuery"
+        - $ref: "#/components/parameters/offsetInQuery"
       description: |-
         指定したBOTのイベントログを取得します。
         対象のBOTの管理権限が必要です。
-  '/bots/{botId}/actions/join':
+  "/bots/{botId}/actions/join":
     parameters:
-      - $ref: '#/components/parameters/botIdInPath'
+      - $ref: "#/components/parameters/botIdInPath"
     post:
       summary: BOTをチャンネルに参加させる
       responses:
-        '204':
+        "204":
           description: |-
             No Content
             BOTを参加させました。
-        '400':
+        "400":
           description: Bad Request
-        '403':
+        "403":
           description: Forbidden
-        '404':
+        "404":
           description: |-
             Not Found
             BOTが見つかりません。
@@ -3323,22 +3427,22 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/PostBotActionJoinRequest'
-  '/bots/{botId}/actions/leave':
+              $ref: "#/components/schemas/PostBotActionJoinRequest"
+  "/bots/{botId}/actions/leave":
     parameters:
-      - $ref: '#/components/parameters/botIdInPath'
+      - $ref: "#/components/parameters/botIdInPath"
     post:
       summary: BOTをチャンネルから退出させる
       responses:
-        '204':
+        "204":
           description: |-
             No Content
             BOTを退出させました。
-        '400':
+        "400":
           description: Bad Request
-        '403':
+        "403":
           description: Forbidden
-        '404':
+        "404":
           description: |-
             Not Found
             BOTが見つかりません。
@@ -3349,20 +3453,20 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/PostBotActionLeaveRequest'
+              $ref: "#/components/schemas/PostBotActionLeaveRequest"
       description: |-
         指定したBOTを指定したチャンネルから退出させます。
         対象のBOTの管理権限が必要です。
-  '/channels/{channelId}/bots':
+  "/channels/{channelId}/bots":
     parameters:
-      - $ref: '#/components/parameters/channelIdInPath'
+      - $ref: "#/components/parameters/channelIdInPath"
     get:
       summary: チャンネル参加中のBOTのリストを取得
       tags:
         - bot
         - channel
       responses:
-        '200':
+        "200":
           description: OK
           content:
             application/json:
@@ -3370,8 +3474,8 @@ paths:
                 type: array
                 description: BOTの配列
                 items:
-                  $ref: '#/components/schemas/BotUser'
-        '404':
+                  $ref: "#/components/schemas/BotUser"
+        "404":
           description: |-
             Not Found
             チャンネルが見つかりません。
@@ -3381,15 +3485,15 @@ paths:
     post:
       summary: Skyway用認証API
       responses:
-        '200':
+        "200":
           description: OK
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/WebRTCAuthenticateResult'
-        '400':
+                $ref: "#/components/schemas/WebRTCAuthenticateResult"
+        "400":
           description: Bad Request
-        '503':
+        "503":
           description: |-
             Service Unavailable
             WebRTCは現在機能を停止しています
@@ -3401,37 +3505,37 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/PostWebRTCAuthenticateRequest'
-  '/channels/{channelId}':
+              $ref: "#/components/schemas/PostWebRTCAuthenticateRequest"
+  "/channels/{channelId}":
     parameters:
-      - $ref: '#/components/parameters/channelIdInPath'
+      - $ref: "#/components/parameters/channelIdInPath"
     get:
       summary: チャンネル情報を取得
       tags:
         - channel
       responses:
-        '200':
+        "200":
           description: OK
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Channel'
-        '404':
+                $ref: "#/components/schemas/Channel"
+        "404":
           description: Not Found
       operationId: getChannel
       description: 指定したチャンネルの情報を取得します。
     patch:
       summary: チャンネル情報を変更
       responses:
-        '204':
+        "204":
           description: No Content
-        '400':
+        "400":
           description: Bad Request
-        '403':
+        "403":
           description: Forbidden
-        '404':
+        "404":
           description: Not Found
-        '409':
+        "409":
           description: |-
             Conflict
             変更後の名前のチャンネルが既に存在しています。
@@ -3442,7 +3546,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/PatchChannelRequest'
+              $ref: "#/components/schemas/PatchChannelRequest"
       description: |-
         指定したチャンネルの情報を変更します。
         変更には権限が必要です。
@@ -3453,25 +3557,25 @@ paths:
       tags:
         - webrtc
       responses:
-        '200':
+        "200":
           description: OK
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/WebRTCUserStates'
+                $ref: "#/components/schemas/WebRTCUserStates"
       operationId: getWebRTCState
       description: 現在のWebRTC状態を取得します。
   /clip-folders:
     post:
       summary: クリップフォルダを作成
       responses:
-        '201':
+        "201":
           description: Created
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ClipFolder'
-        '400':
+                $ref: "#/components/schemas/ClipFolder"
+        "400":
           description: Bad Request
       operationId: createClipFolder
       tags:
@@ -3480,14 +3584,14 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/PostClipFolderRequest'
+              $ref: "#/components/schemas/PostClipFolderRequest"
       description: |-
         クリップフォルダを作成します。
         既にあるフォルダと同名のフォルダを作成することは可能です。
     get:
       summary: クリップフォルダのリストを取得
       responses:
-        '200':
+        "200":
           description: OK
           content:
             application/json:
@@ -3495,27 +3599,27 @@ paths:
                 type: array
                 description: クリップフォルダの配列
                 items:
-                  $ref: '#/components/schemas/ClipFolder'
+                  $ref: "#/components/schemas/ClipFolder"
       tags:
         - clip
       operationId: getClipFolders
       parameters: []
       description: 自身が所有するクリップフォルダのリストを取得します。
-  '/clip-folders/{folderId}':
+  "/clip-folders/{folderId}":
     parameters:
-      - $ref: '#/components/parameters/folderIdInPath'
+      - $ref: "#/components/parameters/folderIdInPath"
     get:
       summary: クリップフォルダ情報を取得
       tags:
         - clip
       responses:
-        '200':
+        "200":
           description: OK
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ClipFolder'
-        '404':
+                $ref: "#/components/schemas/ClipFolder"
+        "404":
           description: |-
             Not Found
             クリップフォルダが見つかりません。
@@ -3524,11 +3628,11 @@ paths:
     delete:
       summary: クリップフォルダを削除
       responses:
-        '204':
+        "204":
           description: |-
             No Content
             削除しました。
-        '404':
+        "404":
           description: |-
             Not Found
             クリップフォルダが見つかりません。
@@ -3539,13 +3643,13 @@ paths:
     patch:
       summary: クリップフォルダ情報を編集
       responses:
-        '204':
+        "204":
           description: |-
             No Content
             編集しました。
-        '400':
+        "400":
           description: Bad Request
-        '404':
+        "404":
           description: Not Found
       operationId: editClipFolder
       tags:
@@ -3554,27 +3658,27 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/PatchClipFolderRequest'
+              $ref: "#/components/schemas/PatchClipFolderRequest"
       description: 指定したクリップフォルダの情報を編集します。
-  '/clip-folders/{folderId}/messages':
+  "/clip-folders/{folderId}/messages":
     parameters:
-      - $ref: '#/components/parameters/folderIdInPath'
+      - $ref: "#/components/parameters/folderIdInPath"
     post:
       summary: メッセージをクリップフォルダに追加
       responses:
-        '200':
+        "200":
           description: OK
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ClippedMessage'
-        '400':
+                $ref: "#/components/schemas/ClippedMessage"
+        "400":
           description: Bad Request
-        '404':
+        "404":
           description: |-
             Not Found
             クリップフォルダが見つかりません。
-        '409':
+        "409":
           description: |-
             Conflict
             既に追加されています。
@@ -3585,12 +3689,12 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/PostClipFolderMessageRequest'
+              $ref: "#/components/schemas/PostClipFolderMessageRequest"
       description: 指定したメッセージを指定したクリップフォルダに追加します。
     get:
       summary: フォルダ内のクリップのリストを取得
       responses:
-        '200':
+        "200":
           description: OK
           content:
             application/json:
@@ -3598,33 +3702,33 @@ paths:
                 type: array
                 description: クリップの配列
                 items:
-                  $ref: '#/components/schemas/ClippedMessage'
-        '404':
+                  $ref: "#/components/schemas/ClippedMessage"
+        "404":
           description: |-
             Not Found
             クリップフォルダが見つかりません。
       operationId: getClips
       parameters:
-        - $ref: '#/components/parameters/limitInQuery'
-        - $ref: '#/components/parameters/offsetInQuery'
-        - $ref: '#/components/parameters/orderInQuery'
+        - $ref: "#/components/parameters/limitInQuery"
+        - $ref: "#/components/parameters/offsetInQuery"
+        - $ref: "#/components/parameters/orderInQuery"
       tags:
         - clip
       description: |-
         指定したフォルダ内のクリップのリストを取得します。
         `order`を指定しない場合、クリップした日時の新しい順で返されます。
-  '/clip-folders/{folderId}/messages/{messageId}':
+  "/clip-folders/{folderId}/messages/{messageId}":
     parameters:
-      - $ref: '#/components/parameters/folderIdInPath'
-      - $ref: '#/components/parameters/messageIdInPath'
+      - $ref: "#/components/parameters/folderIdInPath"
+      - $ref: "#/components/parameters/messageIdInPath"
     delete:
       summary: メッセージをクリップフォルダから除外
       responses:
-        '204':
+        "204":
           description: |-
             No Content
             外しました。
-        '404':
+        "404":
           description: |-
             Not Found
             クリップフォルダが見つかりません。
@@ -3634,16 +3738,16 @@ paths:
         既に外されているメッセージを指定した場合は204を返します。
       tags:
         - clip
-  '/webhooks/{webhookId}/messages':
+  "/webhooks/{webhookId}/messages":
     parameters:
-      - $ref: '#/components/parameters/webhookIdInPath'
+      - $ref: "#/components/parameters/webhookIdInPath"
     get:
       summary: Webhookの投稿メッセージのリストを取得
       tags:
         - webhook
       operationId: getWebhookMessages
       responses:
-        '200':
+        "200":
           description: OK
           content:
             application/json:
@@ -3651,33 +3755,56 @@ paths:
                 type: array
                 description: メッセージの配列
                 items:
-                  $ref: '#/components/schemas/Message'
+                  $ref: "#/components/schemas/Message"
           headers:
             X-TRAQ-MORE:
-              $ref: '#/components/headers/X-TRAQ-MORE'
-        '400':
+              $ref: "#/components/headers/X-TRAQ-MORE"
+        "400":
           description: Bad Request
-        '404':
+        "404":
           description: |-
             Not Found
             Webhookが見つかりません。
       parameters:
-        - $ref: '#/components/parameters/limitInQuery'
-        - $ref: '#/components/parameters/offsetInQuery'
-        - $ref: '#/components/parameters/sinceInQuery'
-        - $ref: '#/components/parameters/untilInQuery'
-        - $ref: '#/components/parameters/inclusiveInQuery'
-        - $ref: '#/components/parameters/orderInQuery'
+        - $ref: "#/components/parameters/limitInQuery"
+        - $ref: "#/components/parameters/offsetInQuery"
+        - $ref: "#/components/parameters/sinceInQuery"
+        - $ref: "#/components/parameters/untilInQuery"
+        - $ref: "#/components/parameters/inclusiveInQuery"
+        - $ref: "#/components/parameters/orderInQuery"
       description: 指定されたWebhookが投稿したメッセージのリストを返します。
-  '/channels/{channelId}/events':
+  "/webhooks/{webhookId}/messages/{messageId}":
     parameters:
-      - $ref: '#/components/parameters/channelIdInPath'
+      - $ref: "#/components/parameters/webhookIdInPath"
+      - $ref: "#/components/parameters/messageIdInPath"
+    delete:
+      summary: Webhookの投稿メッセージを削除
+      description: 指定されたWebhookが投稿したメッセージを削除します。
+      tags:
+        - webhook
+      operationId: DeleteWebhookMessage
+      responses:
+        "204":
+          description: |-
+            No Content
+            正常に削除できました。
+        "403":
+          description: |-
+            Forbidden
+            メッセージを削除する権限がありません。
+        "404":
+          description: |-
+            Not Found
+            webhookまたはメッセージが見つかりません
+  "/channels/{channelId}/events":
+    parameters:
+      - $ref: "#/components/parameters/channelIdInPath"
     get:
       summary: チャンネルイベントのリストを取得
       tags:
         - channel
       responses:
-        '200':
+        "200":
           description: OK
           content:
             application/json:
@@ -3685,24 +3812,24 @@ paths:
                 type: array
                 description: チャンネルイベントの配列
                 items:
-                  $ref: '#/components/schemas/ChannelEvent'
+                  $ref: "#/components/schemas/ChannelEvent"
           headers:
             X-TRAQ-MORE:
-              $ref: '#/components/headers/X-TRAQ-MORE'
-        '400':
+              $ref: "#/components/headers/X-TRAQ-MORE"
+        "400":
           description: Bad Request
-        '404':
+        "404":
           description: |-
             Not Found
             チャンネルが見つかりません。
       operationId: getChannelEvents
       parameters:
-        - $ref: '#/components/parameters/limitInQuery'
-        - $ref: '#/components/parameters/offsetInQuery'
-        - $ref: '#/components/parameters/sinceInQuery'
-        - $ref: '#/components/parameters/untilInQuery'
-        - $ref: '#/components/parameters/inclusiveInQuery'
-        - $ref: '#/components/parameters/orderInQuery'
+        - $ref: "#/components/parameters/limitInQuery"
+        - $ref: "#/components/parameters/offsetInQuery"
+        - $ref: "#/components/parameters/sinceInQuery"
+        - $ref: "#/components/parameters/untilInQuery"
+        - $ref: "#/components/parameters/inclusiveInQuery"
+        - $ref: "#/components/parameters/orderInQuery"
       description: 指定したチャンネルのイベントリストを取得します。
   /stamp-palettes:
     get:
@@ -3710,7 +3837,7 @@ paths:
       tags:
         - stamp
       responses:
-        '200':
+        "200":
           description: OK
           content:
             application/json:
@@ -3718,19 +3845,19 @@ paths:
                 type: array
                 description: スタンプパレットの配列
                 items:
-                  $ref: '#/components/schemas/StampPalette'
+                  $ref: "#/components/schemas/StampPalette"
       operationId: getStampPalettes
       description: 自身が所有しているスタンプパレットのリストを取得します。
     post:
       summary: スタンプパレットを作成
       responses:
-        '201':
+        "201":
           description: Created
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/StampPalette'
-        '400':
+                $ref: "#/components/schemas/StampPalette"
+        "400":
           description: Bad Request
       tags:
         - stamp
@@ -3740,37 +3867,37 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/PostStampPaletteRequest'
-  '/stamp-palettes/{paletteId}':
+              $ref: "#/components/schemas/PostStampPaletteRequest"
+  "/stamp-palettes/{paletteId}":
     parameters:
-      - $ref: '#/components/parameters/paletteIdInPath'
+      - $ref: "#/components/parameters/paletteIdInPath"
     get:
       summary: スタンプパレットを取得
       tags:
         - stamp
       responses:
-        '200':
+        "200":
           description: OK
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/StampPalette'
-        '404':
+                $ref: "#/components/schemas/StampPalette"
+        "404":
           description: Not Found
       operationId: getStampPalette
       description: 指定したスタンプパレットの情報を取得します。
     delete:
       summary: スタンプパレットを削除
       responses:
-        '204':
+        "204":
           description: |-
             No Content
             削除しました。
-        '403':
+        "403":
           description: |-
             Forbidden
             対象のスタンプパレットを削除する権限がありません。
-        '404':
+        "404":
           description: Not Found
       operationId: deleteStampPalette
       description: |-
@@ -3781,17 +3908,17 @@ paths:
     patch:
       summary: スタンプパレットを編集
       responses:
-        '204':
+        "204":
           description: |-
             No Content
             変更しました。
-        '400':
+        "400":
           description: Bad Request
-        '403':
+        "403":
           description: |-
             Forbidden
             対象のスタンプパレットを編集する権限がありません。
-        '404':
+        "404":
           description: Not Found
       operationId: editStampPalette
       tags:
@@ -3800,7 +3927,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/PatchStampPaletteRequest'
+              $ref: "#/components/schemas/PatchStampPaletteRequest"
       description: |-
         指定したスタンプパレットを編集します。
         リクエストのスタンプの配列の順番は保存されて変更されます。
@@ -3811,7 +3938,7 @@ paths:
       tags:
         - activity
       responses:
-        '200':
+        "200":
           description: OK
           content:
             application/json:
@@ -3822,15 +3949,15 @@ paths:
                   type: string
       operationId: getOnlineUsers
       description: 現在オンラインな(SSEまたはWSが接続中)ユーザーのUUIDのリストを返します。
-  '/stamps/{stampId}/image':
+  "/stamps/{stampId}/image":
     parameters:
-      - $ref: '#/components/parameters/stampIdInPath'
+      - $ref: "#/components/parameters/stampIdInPath"
     get:
       summary: スタンプ画像を取得
       tags:
         - stamp
       responses:
-        '200':
+        "200":
           description: OK
           content:
             image/png:
@@ -3845,7 +3972,10 @@ paths:
               schema:
                 type: string
                 format: binary
-        '404':
+            image/svg+xml:
+              schema:
+                type: string
+        "404":
           description: Not Found
       operationId: getStampImage
       description: 指定したIDのスタンプ画像を返します。
@@ -3853,13 +3983,13 @@ paths:
       summary: スタンプ画像を変更
       operationId: changeStampImage
       responses:
-        '204':
+        "204":
           description: No Content
-        '400':
+        "400":
           description: Bad Request
-        '404':
+        "404":
           description: Not Found
-        '413':
+        "413":
           description: Request Entity Too Large
       tags:
         - stamp
@@ -3874,18 +4004,18 @@ paths:
                 file:
                   type: string
                   format: binary
-                  description: 'スタンプ画像(1MBまでのpng, jpeg, gif)'
+                  description: "スタンプ画像(1MBまでのpng, jpeg, gif)"
               required:
                 - file
-        description: ''
-  '/users/me/unread/{channelId}':
+        description: ""
+  "/users/me/unread/{channelId}":
     parameters:
-      - $ref: '#/components/parameters/channelIdInPath'
+      - $ref: "#/components/parameters/channelIdInPath"
     delete:
       summary: チャンネルを既読にする
       operationId: readChannel
       responses:
-        '204':
+        "204":
           description: |-
             No Content
             既読にしました。
@@ -3893,24 +4023,24 @@ paths:
       tags:
         - me
         - notification
-  '/groups/{groupId}/admins/{userId}':
+  "/groups/{groupId}/admins/{userId}":
     parameters:
-      - $ref: '#/components/parameters/groupIdInPath'
-      - $ref: '#/components/parameters/userIdInPath'
+      - $ref: "#/components/parameters/groupIdInPath"
+      - $ref: "#/components/parameters/userIdInPath"
     delete:
       summary: グループ管理者を削除
       responses:
-        '204':
+        "204":
           description: |-
             No Content
             指定したユーザーがユーザーグループ管理者から削除されました。
-        '400':
+        "400":
           description: Bad Request
-        '403':
+        "403":
           description: |-
             Forbidden
             ユーザーグループを操作する権限がありません。
-        '404':
+        "404":
           description: |-
             Not Found
             ユーザーグループが見つかりません。
@@ -3921,23 +4051,23 @@ paths:
         指定したユーザーグループから指定した管理者を削除します。
         対象のユーザーグループの管理者権限が必要です。
         グループから管理者が存在しなくなる場合は400エラーを返します。
-  '/groups/{groupId}/admins':
+  "/groups/{groupId}/admins":
     parameters:
-      - $ref: '#/components/parameters/groupIdInPath'
+      - $ref: "#/components/parameters/groupIdInPath"
     post:
       summary: グループ管理者を追加
       responses:
-        '204':
+        "204":
           description: |-
             No Content
             追加されました。
-        '400':
+        "400":
           description: Bad Request
-        '403':
+        "403":
           description: |-
             Forbidden
             ユーザーグループを操作する権限がありません。
-        '404':
+        "404":
           description: |-
             Not Found
             ユーザーグループが見つかりません。
@@ -3945,8 +4075,8 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/PostUserGroupAdminRequest'
-        description: ''
+              $ref: "#/components/schemas/PostUserGroupAdminRequest"
+        description: ""
       tags:
         - group
       operationId: addUserGroupAdmin
@@ -3958,7 +4088,7 @@ paths:
       tags:
         - group
       responses:
-        '200':
+        "200":
           description: OK
           content:
             application/json:
@@ -3968,7 +4098,7 @@ paths:
                 items:
                   type: string
                   format: uuid
-        '404':
+        "404":
           description: |-
             Not Found
             ユーザーグループが見つかりません。
@@ -3985,17 +4115,17 @@ paths:
         content:
           application/x-www-form-urlencoded:
             schema:
-              $ref: '#/components/schemas/PostOAuth2Token'
+              $ref: "#/components/schemas/PostOAuth2Token"
       responses:
-        '200':
+        "200":
           description: トークンが正常に発行されました。
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/OAuth2Token'
-        '400':
+                $ref: "#/components/schemas/OAuth2Token"
+        "400":
           description: トークン発行に失敗しました。
-        '403':
+        "403":
           description: トークン発行に失敗しました。
       summary: OAuth2 トークンエンドポイント
   /oauth2/authorize/decide:
@@ -4009,13 +4139,13 @@ paths:
         content:
           application/x-www-form-urlencoded:
             schema:
-              $ref: '#/components/schemas/OAuth2Decide'
+              $ref: "#/components/schemas/OAuth2Decide"
       responses:
-        '302':
+        "302":
           description: RedirectURIに結果をリダイレクトします。
-        '400':
+        "400":
           description: リクエストが不正です。
-        '403':
+        "403":
           description: リクエストが許可されていません。
       summary: OAuth2 認可承諾API
   /oauth2/authorize:
@@ -4028,7 +4158,7 @@ paths:
         - name: response_type
           in: query
           schema:
-            $ref: '#/components/schemas/OAuth2ResponseType'
+            $ref: "#/components/schemas/OAuth2ResponseType"
         - name: client_id
           in: query
           required: true
@@ -4061,13 +4191,13 @@ paths:
         - name: prompt
           in: query
           schema:
-            $ref: '#/components/schemas/OAuth2Prompt'
+            $ref: "#/components/schemas/OAuth2Prompt"
       responses:
-        '302':
+        "302":
           description: 結果に応じてリダイレクトします。
-        '400':
+        "400":
           description: リクエストが不正です。
-        '403':
+        "403":
           description: リクエストが許可されていません。
       summary: OAuth2 認可エンドポイント
     post:
@@ -4080,13 +4210,13 @@ paths:
         content:
           application/x-www-form-urlencoded:
             schema:
-              $ref: '#/components/schemas/OAuth2Authorization'
+              $ref: "#/components/schemas/OAuth2Authorization"
       responses:
-        '302':
+        "302":
           description: 結果に応じてリダイレクトします。
-        '400':
+        "400":
           description: リクエストが不正です。
-        '403':
+        "403":
           description: リクエストが許可されていません。
       summary: OAuth2 認可エンドポイント
   /oauth2/revoke:
@@ -4094,7 +4224,7 @@ paths:
       summary: OAuth2 トークン無効化エンドポイント
       operationId: revokeOAuth2Token
       responses:
-        '200':
+        "200":
           description: OK
       description: OAuth2 トークン無効化エンドポイント
       tags:
@@ -4104,7 +4234,7 @@ paths:
         content:
           application/x-www-form-urlencoded:
             schema:
-              $ref: '#/components/schemas/OAuth2Revoke'
+              $ref: "#/components/schemas/OAuth2Revoke"
   /users/me/ex-accounts:
     get:
       summary: 外部ログインアカウント一覧を取得
@@ -4112,7 +4242,7 @@ paths:
         - authentication
         - me
       responses:
-        '200':
+        "200":
           description: OK
           content:
             application/json:
@@ -4120,7 +4250,7 @@ paths:
                 type: array
                 description: 紐付けられているアカウントの配列
                 items:
-                  $ref: '#/components/schemas/ExternalProviderUser'
+                  $ref: "#/components/schemas/ExternalProviderUser"
       operationId: getMyExternalAccounts
       description: 自分に紐付けられている外部ログインアカウント一覧を取得します。
     parameters: []
@@ -4129,11 +4259,11 @@ paths:
       summary: 外部ログインアカウントを紐付ける
       operationId: linkExternalAccount
       responses:
-        '302':
+        "302":
           description: |-
             Found
             外部サービスの認証画面に遷移します。
-        '400':
+        "400":
           description: Bad Request
       tags:
         - authentication
@@ -4146,17 +4276,17 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/PostLinkExternalAccount'
+              $ref: "#/components/schemas/PostLinkExternalAccount"
   /users/me/ex-accounts/unlink:
     post:
       summary: 外部ログインアカウントの紐付けを解除
       operationId: unlinkExternalAccount
       responses:
-        '204':
+        "204":
           description: |-
             No Content
             紐付けを解除しました。
-        '400':
+        "400":
           description: Bad Request
       description: 自分に紐付けられている外部ログインアカウントの紐付けを解除します。
       tags:
@@ -4166,8 +4296,8 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/PostUnlinkExternalAccount'
-  '/users/{userId}/dm-channel':
+              $ref: "#/components/schemas/PostUnlinkExternalAccount"
+  "/users/{userId}/dm-channel":
     parameters:
       - schema:
           type: string
@@ -4181,13 +4311,13 @@ paths:
         - user
         - channel
       responses:
-        '200':
+        "200":
           description: OK
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/DMChannel'
-        '404':
+                $ref: "#/components/schemas/DMChannel"
+        "404":
           description: |
             Not Found
             ユーザーが見つかりません。
@@ -4195,24 +4325,24 @@ paths:
       description: |-
         指定したユーザーとのダイレクトメッセージチャンネルの情報を返します。
         ダイレクトメッセージチャンネルが存在しなかった場合、自動的に作成されます。
-  '/messages/{messageId}/clips':
+  "/messages/{messageId}/clips":
     parameters:
-      - $ref: '#/components/parameters/messageIdInPath'
+      - $ref: "#/components/parameters/messageIdInPath"
     get:
       summary: 自分のクリップを取得
       tags:
         - message
         - clip
       responses:
-        '200':
+        "200":
           description: OK
           content:
             application/json:
               schema:
                 type: array
                 items:
-                  $ref: '#/components/schemas/MessageClip'
-        '404':
+                  $ref: "#/components/schemas/MessageClip"
+        "404":
           description: |
             Not Found
       operationId: getMessageClips
@@ -4223,13 +4353,13 @@ paths:
       tags:
         - ogp
       responses:
-        '200':
+        "200":
           description: OK
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Ogp'
-        '400':
+                $ref: "#/components/schemas/Ogp"
+        "400":
           description: 指定したURLが不正です。
       operationId: getOgp
       description: |
@@ -4248,9 +4378,9 @@ paths:
       tags:
         - ogp
       responses:
-        '204':
+        "204":
           description: No Content
-        '400':
+        "400":
           description: 指定したURLが不正です。
       operationId: deleteOgpCache
       description: 指定されたURLのOGP情報のキャッシュを削除します。
@@ -4269,12 +4399,12 @@ paths:
       tags:
         - me
       responses:
-        '200':
+        "200":
           description: OK
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/UserSettings'
+                $ref: "#/components/schemas/UserSettings"
   /users/me/settings/notify-citation:
     get:
       summary: メッセージ引用通知の設定情報を取得
@@ -4283,47 +4413,286 @@ paths:
       tags:
         - me
       responses:
-        '200':
+        "200":
           description: OK
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/GetNotifyCitation'
+                $ref: "#/components/schemas/GetNotifyCitation"
     put:
       summary: メッセージ引用通知の設定情報を変更
       responses:
-        '204':
+        "204":
           description: 変更できました。
-        '400':
+        "400":
           description: Bad Request
       requestBody:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/PutNotifyCitationRequest'
-        description: ''
+              $ref: "#/components/schemas/PutNotifyCitationRequest"
+        description: ""
       tags:
         - me
       operationId: changeMyNotifyCitation
       description: メッセージ引用通知の設定情報を変更します
-  '/channels/{channelId}/path':
+  "/channels/{channelId}/path":
     parameters:
-      - $ref: '#/components/parameters/channelIdInPath'
+      - $ref: "#/components/parameters/channelIdInPath"
     get:
       summary: 指定したチャンネルパスを取得
+      description: 指定されたチャンネルのパスを取得します。
       tags:
         - channel
       responses:
-        '200':
+        "200":
           description: OK
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ChannelPath'
-        '404':
+                $ref: "#/components/schemas/ChannelPath"
+        "404":
           description: Not Found
       operationId: getChannelPath
-      description: 指定したチャンネルのパスを取得します。
+  /qall/endpoints:
+    get:
+      summary: LiveKitエンドポイントを取得
+      description: >
+        接続可能なLiveKitエンドポイントを取得します。
+      operationId: getQallEndpoints
+      tags:
+        - qall
+      responses:
+        "200":
+          description: 成功 - LiveKitエンドポイントの取得
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/qallEndpointResponse"
+        "404":
+          description: Not Found
+        "500":
+          description: Internal Server Error
+  /qall/token:
+    get:
+      summary: LiveKitトークンを取得
+      description: >
+        指定したルームに参加するためのLiveKitトークンを取得します。
+      operationId: getLiveKitToken
+      tags:
+        - qall
+      parameters:
+        - $ref: "#/components/parameters/roomIdInQuery"
+        - $ref: "#/components/parameters/isWebinarInQuery"
+      responses:
+        "200":
+          description: 成功 - LiveKitトークンを返します
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/qallTokenResponse"
+        "400":
+          description: Bad Request
+        "401":
+          description: Unauthorized
+        "500":
+          description: Internal Server Error
+  /qall/rooms:
+    get:
+      summary: ルームと参加者の一覧を取得
+      description: >
+        現在存在する(またはアクティブな)ルームと、そのルームに所属している参加者情報を取得します。
+      operationId: getRooms
+      tags:
+        - qall
+      responses:
+        "200":
+          description: 成功 - ルームと参加者一覧の取得
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/qallRoomsListResponse"
+        "404":
+          description: Not Found
+        "500":
+          description: Internal Server Error
+  /qall/rooms/{roomId}/metadata:
+    get:
+      summary: ルームのメタデータを取得
+      description: >
+        ルームのメタデータを取得します。
+      operationId: getRoomMetadata
+      tags:
+        - qall
+      parameters:
+        - $ref: "#/components/parameters/roomIdInPath"
+      responses:
+        "200":
+          description: 成功 - ルームのメタデータを取得
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/qallMetadataResponse"
+        "404":
+          description: Not Found
+        "500":
+          description: Internal Server Error
+    patch:
+      summary: ルームのメタデータを更新
+      description: >
+        ルームのメタデータを更新します。
+      operationId: updateRoomMetadata
+      tags:
+        - qall
+      parameters:
+        - $ref: "#/components/parameters/roomIdInPath"
+      requestBody:
+        description: ルームのメタデータ
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/qallMetadataRequest"
+      responses:
+        "200":
+          description: 成功 - ルームのメタデータを更新
+        "400":
+          description: Bad Request
+        "401":
+          description: Unauthorized
+        "500":
+          description: Internal Server Error
+  /qall/rooms/{roomId}/participants:
+    patch:
+      summary: ルームでの発言権限を変更
+      description: >
+        ルーム内の参加者の発言権限を変更します。
+      operationId: changeParticipantRole
+      tags:
+        - qall
+      parameters:
+        - $ref: "#/components/parameters/roomIdInPath"
+      requestBody:
+        description: 発言権限を変更する参加者の情報
+        required: true
+        content:
+          application/json:
+            schema:
+              type: array
+              items:
+                $ref: "#/components/schemas/qallParticipantRequest"
+      responses:
+        "200":
+          description: 成功 - 発言権限を変更（部分的成功含む）
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/qallParticipantResponse"
+        "400":
+          description: Bad Request
+        "401":
+          description: Unauthorized
+        "500":
+          description: Internal Server Error
+  /qall/webhook:
+    post:
+      summary: LiveKit Webhook受信
+      description: >
+        LiveKit側で設定したWebhookから呼び出されるエンドポイントです。  
+        参加者の入室・退出などのイベントを受け取り、サーバ内で処理を行います。
+      operationId: liveKitWebhook
+      tags:
+        - qall
+      requestBody:
+        required: true
+        content:
+          application/webhook+json:
+            schema:
+              type: object
+              description: LiveKit Webhook イベントのペイロード
+      responses:
+        "200":
+          description: Webhookを正常に受信
+        "400":
+          description: Invalid payload
+        "500":
+          description: Internal Server Error
+  /qall/soundboard:
+    get:
+      summary: サウンドボード用の音声一覧を取得
+      description: >
+        DBに保存されたサウンドボード情報を取得します。  
+        各アイテムには soundId, soundName, stampId が含まれます。
+      operationId: getSoundboardList
+      tags:
+        - qall
+      responses:
+        "200":
+          description: サウンド一覧の取得に成功
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/soundboardListResponse"
+        "500":
+          description: サーバエラー
+
+    post:
+      summary: サウンドボード用の短い音声ファイルをアップロード
+      description: >
+        15秒程度の短い音声ファイルを multipart/form-data で送信し、S3(互換ストレージ)にアップロードします。  
+        クライアントは「soundName」というフィールドを送信し、それをDBに保存して関連付けを行います。  
+        また、サーバ側で soundId を自動生成し、S3のファイル名に使用します。
+      operationId: postSoundboard
+      tags:
+        - qall
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              $ref: "#/components/schemas/soundboardUploadRequest"
+      responses:
+        "200":
+          description: アップロード成功
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/soundboardUploadResponse"
+        "400":
+          description: ファイルが提供されていない等
+        "500":
+          description: アップロードエラーなどのサーバエラー
+
+  /qall/soundboard/play:
+    post:
+      summary: アップロード済み音声を LiveKit ルームで再生
+      description: >
+        S3上にある音声ファイルの署名付きURLを生成し、  
+        Ingressを介して指定ルームに音声を流します。    
+        該当ルームに参加しているユーザであれば再生可能とします。
+      operationId: postSoundboardPlay
+      tags:
+        - qall
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/soundboardPlayRequest"
+      responses:
+        "200":
+          description: Ingressの作成に成功
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/soundboardPlayResponse"
+        "400":
+          description: パラメータ不足 or ユーザが部屋にいない等
+        "401":
+          description: 認証エラー
+        "500":
+          description: Ingress作成失敗などのサーバエラー
+
 components:
   securitySchemes:
     cookieAuth:
@@ -4379,12 +4748,16 @@ components:
           type: array
           description: 押されているスタンプの配列
           items:
-            $ref: '#/components/schemas/MessageStamp'
+            $ref: "#/components/schemas/MessageStamp"
         threadId:
           type: string
           format: uuid
           description: スレッドUUID
           nullable: true
+        nonce:
+          type: string
+          pattern: "^[a-zA-Z0-9_-]{1,32}$"
+          description: メッセージ送信の確認に使うことができる任意の識別子(投稿でのみ使用可)
       required:
         - id
         - userId
@@ -4456,7 +4829,7 @@ components:
           format: date-time
           description: ピン留めされた日時
         message:
-          $ref: '#/components/schemas/Message'
+          $ref: "#/components/schemas/Message"
       required:
         - userId
         - pinnedAt
@@ -4487,7 +4860,7 @@ components:
         name:
           type: string
           description: チャンネル名
-          pattern: '^[a-zA-Z0-9-_]{1,20}$'
+          pattern: "^[a-zA-Z0-9-_]{1,20}$"
         children:
           type: array
           description: 子チャンネルのUUID配列
@@ -4516,6 +4889,10 @@ components:
           type: boolean
           default: false
           description: メンション・チャンネルリンクを自動埋め込みするか
+        nonce:
+          type: string
+          pattern: "^[a-zA-Z0-9_-]{1,32}$"
+          description: メッセージ送信の確認に使うことができる任意の識別子(投稿でのみ使用可)
       required:
         - content
     ChannelStats:
@@ -4531,12 +4908,12 @@ components:
           type: array
           description: チャンネル上のスタンプ統計情報
           items:
-            $ref: '#/components/schemas/ChannelStatsStamp'
+            $ref: "#/components/schemas/ChannelStatsStamp"
         users:
           type: array
           description: チャンネル上のユーザー統計情報
           items:
-            $ref: '#/components/schemas/ChannelStatsUser'
+            $ref: "#/components/schemas/ChannelStatsUser"
         datetime:
           type: string
           format: date-time
@@ -4614,7 +4991,7 @@ components:
           format: uuid
           description: ユーザーUUID
         state:
-          $ref: '#/components/schemas/ChannelViewState'
+          $ref: "#/components/schemas/ChannelViewState"
         updatedAt:
           type: string
           format: date-time
@@ -4636,7 +5013,7 @@ components:
           format: uuid
           description: チャンネルUUID
         state:
-          $ref: '#/components/schemas/ChannelViewState'
+          $ref: "#/components/schemas/ChannelViewState"
       required:
         - key
         - channelId
@@ -4646,10 +5023,12 @@ components:
       title: ChannelViewState
       enum:
         - none
+        - stale_viewing
         - monitoring
         - editing
       x-enum-descriptions:
-        - バックグランド表示中
+        - バックグラウンド表示中
+        - 古いメッセージを表示中
         - メッセージ表示中
         - メッセージ入力中
       description: 閲覧状態
@@ -4685,7 +5064,7 @@ components:
       type: object
       properties:
         type:
-          $ref: '#/components/schemas/ThumbnailType'
+          $ref: "#/components/schemas/ThumbnailType"
         mime:
           type: string
           description: MIMEタイプ
@@ -4732,7 +5111,7 @@ components:
         thumbnails:
           type: array
           items:
-            $ref: '#/components/schemas/ThumbnailInfo'
+            $ref: "#/components/schemas/ThumbnailInfo"
         thumbnail:
           deprecated: true
           type: object
@@ -4805,7 +5184,7 @@ components:
         name:
           type: string
           description: スタンプ名
-          pattern: '^[a-zA-Z0-9_-]{1,32}$'
+          pattern: "^[a-zA-Z0-9_-]{1,32}$"
         creatorId:
           type: string
           description: 作成者UUID
@@ -4841,11 +5220,11 @@ components:
         name:
           type: string
           description: スタンプ名
-          pattern: '^[a-zA-Z0-9_-]{1,32}$'
+          pattern: "^[a-zA-Z0-9_-]{1,32}$"
         file:
           type: string
           format: binary
-          description: 'スタンプ画像(1MBまでのpng, jpeg, gif)'
+          description: "スタンプ画像(1MBまでのpng, jpeg, gif)"
       required:
         - name
         - file
@@ -4877,7 +5256,7 @@ components:
         name:
           type: string
           description: スタンプ名
-          pattern: '^[a-zA-Z0-9_-]{1,32}$'
+          pattern: "^[a-zA-Z0-9_-]{1,32}$"
         creatorId:
           type: string
           description: 作成者UUID
@@ -4920,7 +5299,7 @@ components:
           format: uuid
         name:
           type: string
-          pattern: '^[a-zA-Z0-9_-]{1,32}$'
+          pattern: "^([a-zA-Z0-9_-]{1,32}|Webhook#[a-zA-Z0-9_-]{22})$"
           description: ユーザー名
         displayName:
           type: string
@@ -4935,7 +5314,7 @@ components:
           type: boolean
           description: BOTかどうか
         state:
-          $ref: '#/components/schemas/UserAccountState'
+          $ref: "#/components/schemas/UserAccountState"
         updatedAt:
           type: string
           description: 更新日時
@@ -4958,7 +5337,7 @@ components:
           format: uuid
           description: ユーザーUUID
         state:
-          $ref: '#/components/schemas/UserAccountState'
+          $ref: "#/components/schemas/UserAccountState"
         bot:
           type: boolean
           description: BOTかどうか
@@ -4973,12 +5352,12 @@ components:
           maxLength: 32
         name:
           type: string
-          pattern: '^[a-zA-Z0-9_-]{1,32}$'
+          pattern: "^([a-zA-Z0-9_-]{1,32}|Webhook#[a-zA-Z0-9_-]{22})$"
           description: ユーザー名
         twitterId:
           type: string
           description: Twitter ID
-          pattern: '^[a-zA-Z0-9_]{0,15}$'
+          pattern: "^[a-zA-Z0-9_]{0,15}$"
         lastOnline:
           type: string
           description: 最終オンライン日時
@@ -4992,7 +5371,7 @@ components:
           type: array
           description: タグリスト
           items:
-            $ref: '#/components/schemas/UserTag'
+            $ref: "#/components/schemas/UserTag"
         groups:
           type: array
           description: 所属グループのUUIDの配列
@@ -5098,7 +5477,7 @@ components:
           type: array
           description: グループメンバーの配列
           items:
-            $ref: '#/components/schemas/UserGroupMember'
+            $ref: "#/components/schemas/UserGroupMember"
         createdAt:
           type: string
           description: 作成日時
@@ -5139,6 +5518,12 @@ components:
       required:
         - id
         - role
+    UserGroupMembers:
+      title: UserGroupMembers
+      type: array
+      description: ユーザーグループメンバーの配列
+      items:
+        $ref: "#/components/schemas/UserGroupMember"
     UserStats:
       title: UserStats
       type: object
@@ -5152,7 +5537,7 @@ components:
           type: array
           description: ユーザーのスタンプ統計情報
           items:
-            $ref: '#/components/schemas/UserStatsStamp'
+            $ref: "#/components/schemas/UserStatsStamp"
         datetime:
           type: string
           format: date-time
@@ -5250,7 +5635,7 @@ components:
           type: array
           description: タグリスト
           items:
-            $ref: '#/components/schemas/UserTag'
+            $ref: "#/components/schemas/UserTag"
         updatedAt:
           type: string
           format: date-time
@@ -5263,10 +5648,10 @@ components:
         twitterId:
           type: string
           description: Twitter ID
-          pattern: '^[a-zA-Z0-9_]{1,15}$'
+          pattern: "^[a-zA-Z0-9_]{1,15}$"
         name:
           type: string
-          pattern: '^[a-zA-Z0-9_-]{1,32}$'
+          pattern: "^([a-zA-Z0-9_-]{1,32}|Webhook#[a-zA-Z0-9_-]{22})$"
           description: ユーザー名
         displayName:
           type: string
@@ -5281,12 +5666,12 @@ components:
           type: boolean
           description: BOTかどうか
         state:
-          $ref: '#/components/schemas/UserAccountState'
+          $ref: "#/components/schemas/UserAccountState"
         permissions:
           type: array
           description: 所有している権限の配列
           items:
-            $ref: '#/components/schemas/UserPermission'
+            $ref: "#/components/schemas/UserPermission"
         homeChannel:
           type: string
           format: uuid
@@ -5318,11 +5703,11 @@ components:
           format: uuid
         name:
           type: string
-          pattern: '^[a-zA-Z0-9_-]{1,32}$'
+          pattern: "^([a-zA-Z0-9_-]{1,32}|Webhook#[a-zA-Z0-9_-]{22})$"
           description: ユーザー名
         preferred_username:
           type: string
-          pattern: '^[a-zA-Z0-9_-]{1,32}$'
+          pattern: "^([a-zA-Z0-9_-]{1,32}|Webhook#[a-zA-Z0-9_-]{22})$"
           description: ユーザー名
         picture:
           type: string
@@ -5332,7 +5717,7 @@ components:
           format: int64
           description: 更新日時
         traq:
-          $ref: '#/components/schemas/OIDCTraqUserInfo'
+          $ref: "#/components/schemas/OIDCTraqUserInfo"
       required:
         - sub
         - name
@@ -5357,7 +5742,7 @@ components:
           type: array
           description: タグリスト
           items:
-            $ref: '#/components/schemas/UserTag'
+            $ref: "#/components/schemas/UserTag"
         last_online:
           type: string
           description: 最終オンライン日時
@@ -5366,7 +5751,7 @@ components:
         twitter_id:
           type: string
           description: Twitter ID
-          pattern: '^[a-zA-Z0-9_]{1,15}$'
+          pattern: "^[a-zA-Z0-9_]{1,15}$"
         display_name:
           type: string
           description: ユーザー表示名
@@ -5380,12 +5765,12 @@ components:
           type: boolean
           description: BOTかどうか
         state:
-          $ref: '#/components/schemas/UserAccountState'
+          $ref: "#/components/schemas/UserAccountState"
         permissions:
           type: array
           description: 所有している権限の配列
           items:
-            $ref: '#/components/schemas/UserPermission'
+            $ref: "#/components/schemas/UserPermission"
         home_channel:
           type: string
           format: uuid
@@ -5409,13 +5794,13 @@ components:
       type: object
       description: チャンネル購読者編集リクエスト
       properties:
-        'on':
+        "on":
           type: array
           description: 通知をオンにするユーザーのUUID配列
           items:
             type: string
             format: uuid
-        'off':
+        "off":
           type: array
           description: 通知をオフにするユーザーのUUID配列
           items:
@@ -5426,7 +5811,7 @@ components:
       type: object
       description: 通知をオンにするユーザーのUUID配列
       properties:
-        'on':
+        "on":
           type: array
           format: uuid
           description: 通知をオンにするユーザーのUUID配列
@@ -5434,7 +5819,7 @@ components:
             type: string
             format: uuid
       required:
-        - 'on'
+        - "on"
     UserSubscribeState:
       title: UserSubscribeState
       type: object
@@ -5445,7 +5830,7 @@ components:
           description: チャンネルUUID
           format: uuid
         level:
-          $ref: '#/components/schemas/ChannelSubscribeLevel'
+          $ref: "#/components/schemas/ChannelSubscribeLevel"
       required:
         - channelId
         - level
@@ -5475,7 +5860,7 @@ components:
       description: チャンネル購読レベル変更リクエスト
       properties:
         level:
-          $ref: '#/components/schemas/ChannelSubscribeLevel'
+          $ref: "#/components/schemas/ChannelSubscribeLevel"
       required:
         - level
     Webhook:
@@ -5588,7 +5973,7 @@ components:
         file:
           type: string
           format: binary
-          description: 'アイコン画像(2MBまでのpng, jpeg, gif)'
+          description: "アイコン画像(2MB,`Config.Imaging.MaxPixels`(default: 2560*1600)までのpng, jpeg, gif)"
       required:
         - file
     PutMyPasswordRequest:
@@ -5619,7 +6004,7 @@ components:
           description: 新しい表示名
         twitterId:
           type: string
-          pattern: '^[a-zA-Z0-9_]{1,15}$'
+          pattern: "^[a-zA-Z0-9_]{1,15}$"
           description: TwitterID
         bio:
           type: string
@@ -5654,9 +6039,9 @@ components:
         twitterId:
           type: string
           description: TwitterID
-          pattern: '^[a-zA-Z0-9_]{1,15}$'
+          pattern: "^[a-zA-Z0-9_]{1,15}$"
         state:
-          $ref: '#/components/schemas/UserAccountState'
+          $ref: "#/components/schemas/UserAccountState"
         role:
           type: string
           description: ユーザーロール
@@ -5668,7 +6053,7 @@ components:
         token:
           type: string
           description: FCMのデバイストークン
-          example: 'bk3RNwTe3H0:CI2k_HHwgIpoDKCIZvvDMExUdFQ3P1'
+          example: "bk3RNwTe3H0:CI2k_HHwgIpoDKCIZvvDMExUdFQ3P1"
       required:
         - token
     PostUserRequest:
@@ -5679,7 +6064,7 @@ components:
         name:
           type: string
           description: ユーザー名
-          pattern: '^[a-zA-Z0-9_-]{1,32}$'
+          pattern: "^[a-zA-Z0-9_-]{1,32}$"
         password:
           type: string
           pattern: "^[\\x20-\\x7E]{10,32}$"
@@ -5693,7 +6078,7 @@ components:
       properties:
         name:
           type: string
-          pattern: '^[a-zA-Z0-9-_]{1,20}$'
+          pattern: "^[a-zA-Z0-9-_]{1,20}$"
           description: チャンネル名
         parent:
           type: string
@@ -5806,7 +6191,7 @@ components:
         name:
           type: string
           description: ユーザー名
-          pattern: '^[a-zA-Z0-9_-]{1,32}$'
+          pattern: "^([a-zA-Z0-9_-]{1,32}|Webhook#[a-zA-Z0-9_-]{22})$"
         password:
           type: string
           description: パスワード
@@ -5846,7 +6231,7 @@ components:
           type: array
           description: スコープ
           items:
-            $ref: '#/components/schemas/OAuth2Scope'
+            $ref: "#/components/schemas/OAuth2Scope"
         issuedAt:
           type: string
           description: 発行日時
@@ -5891,7 +6276,7 @@ components:
           type: array
           description: 要求スコープの配列
           items:
-            $ref: '#/components/schemas/OAuth2Scope'
+            $ref: "#/components/schemas/OAuth2Scope"
         confidential:
           type: boolean
           description: confidential client なら true, public client なら false
@@ -5952,7 +6337,7 @@ components:
           type: array
           description: 要求スコープの配列
           items:
-            $ref: '#/components/schemas/OAuth2Scope'
+            $ref: "#/components/schemas/OAuth2Scope"
         callbackUrl:
           type: string
           description: コールバックURL
@@ -5990,7 +6375,7 @@ components:
           type: array
           description: 要求スコープの配列
           items:
-            $ref: '#/components/schemas/OAuth2Scope'
+            $ref: "#/components/schemas/OAuth2Scope"
         description:
           type: string
           description: 説明
@@ -6069,9 +6454,9 @@ components:
           items:
             type: string
         mode:
-          $ref: '#/components/schemas/BotMode'
+          $ref: "#/components/schemas/BotMode"
         state:
-          $ref: '#/components/schemas/BotState'
+          $ref: "#/components/schemas/BotState"
         createdAt:
           type: string
           description: 作成日時
@@ -6107,7 +6492,7 @@ components:
           type: boolean
           description: 特権
         mode:
-          $ref: '#/components/schemas/BotMode'
+          $ref: "#/components/schemas/BotMode"
         endpoint:
           type: string
           description: BOTサーバーエンドポイント
@@ -6158,9 +6543,9 @@ components:
           description: 作成日時
           format: date-time
         mode:
-          $ref: '#/components/schemas/BotMode'
+          $ref: "#/components/schemas/BotMode"
         state:
-          $ref: '#/components/schemas/BotState'
+          $ref: "#/components/schemas/BotState"
         subscribeEvents:
           type: array
           description: BOTが購読しているイベントの配列
@@ -6179,7 +6564,7 @@ components:
           description: BOTユーザーUUID
           format: uuid
         tokens:
-          $ref: '#/components/schemas/BotTokens'
+          $ref: "#/components/schemas/BotTokens"
         endpoint:
           type: string
           description: BOTサーバーエンドポイント
@@ -6225,7 +6610,7 @@ components:
           type: string
           description: イベントタイプ
         result:
-          $ref: '#/components/schemas/BotEventResult'
+          $ref: "#/components/schemas/BotEventResult"
         code:
           type: integer
           description: ステータスコード
@@ -6270,7 +6655,7 @@ components:
             BOTユーザーID
             自動的に接頭辞"BOT_"が付与されます
           maxLength: 16
-          pattern: '^[a-zA-Z0-9_-]{1,16}$'
+          pattern: "^[a-zA-Z0-9_-]{1,16}$"
         displayName:
           type: string
           maxLength: 32
@@ -6280,7 +6665,7 @@ components:
           description: BOTの説明
           maxLength: 1000
         mode:
-          $ref: '#/components/schemas/BotMode'
+          $ref: "#/components/schemas/BotMode"
         endpoint:
           type: string
           description: |-
@@ -6372,7 +6757,7 @@ components:
         name:
           type: string
           description: チャンネル名
-          pattern: '^[a-zA-Z0-9-_]{1,20}$'
+          pattern: "^[a-zA-Z0-9-_]{1,20}$"
         archived:
           type: boolean
           description: アーカイブされているかどうか
@@ -6388,7 +6773,7 @@ components:
       type: array
       description: WebRTC状態の配列
       items:
-        $ref: '#/components/schemas/WebRTCUserState'
+        $ref: "#/components/schemas/WebRTCUserState"
     ClipFolder:
       title: ClipFolder
       type: object
@@ -6469,7 +6854,7 @@ components:
       description: クリップされたメッセージ
       properties:
         message:
-          $ref: '#/components/schemas/Message'
+          $ref: "#/components/schemas/Message"
         clippedAt:
           type: string
           description: クリップした日時
@@ -6503,15 +6888,15 @@ components:
         detail:
           description: イベント内容
           oneOf:
-            - $ref: '#/components/schemas/TopicChangedEvent'
-            - $ref: '#/components/schemas/SubscribersChangedEvent'
-            - $ref: '#/components/schemas/PinAddedEvent'
-            - $ref: '#/components/schemas/PinRemovedEvent'
-            - $ref: '#/components/schemas/NameChangedEvent'
-            - $ref: '#/components/schemas/ParentChangedEvent'
-            - $ref: '#/components/schemas/VisibilityChangedEvent'
-            - $ref: '#/components/schemas/ForcedNotificationChangedEvent'
-            - $ref: '#/components/schemas/ChildCreatedEvent'
+            - $ref: "#/components/schemas/TopicChangedEvent"
+            - $ref: "#/components/schemas/SubscribersChangedEvent"
+            - $ref: "#/components/schemas/PinAddedEvent"
+            - $ref: "#/components/schemas/PinRemovedEvent"
+            - $ref: "#/components/schemas/NameChangedEvent"
+            - $ref: "#/components/schemas/ParentChangedEvent"
+            - $ref: "#/components/schemas/VisibilityChangedEvent"
+            - $ref: "#/components/schemas/ForcedNotificationChangedEvent"
+            - $ref: "#/components/schemas/ChildCreatedEvent"
       required:
         - type
         - datetime
@@ -6544,13 +6929,13 @@ components:
           type: string
           description: 変更者UUID
           format: uuid
-        'on':
+        "on":
           type: array
           description: オンにされたユーザーのUUID配列
           items:
             type: string
             format: uuid
-        'off':
+        "off":
           type: array
           description: オフにされたユーザーのUUID配列
           items:
@@ -6558,8 +6943,8 @@ components:
             format: uuid
       required:
         - userId
-        - 'on'
-        - 'off'
+        - "on"
+        - "off"
     PinAddedEvent:
       title: PinAddedEvent
       type: object
@@ -6694,6 +7079,8 @@ components:
         stamps:
           type: array
           description: パレット内のスタンプのUUID配列
+          uniqueItems: true
+          maxItems: 200
           items:
             type: string
             format: uuid
@@ -6775,7 +7162,7 @@ components:
       properties:
         name:
           type: string
-          pattern: '^[a-zA-Z0-9_-]{1,32}$'
+          pattern: "^[a-zA-Z0-9_-]{1,32}$"
           description: スタンプ名
         creatorId:
           type: string
@@ -6817,12 +7204,12 @@ components:
           type: array
           description: パブリックチャンネルの配列
           items:
-            $ref: '#/components/schemas/Channel'
+            $ref: "#/components/schemas/Channel"
         dm:
           type: array
           description: ダイレクトメッセージチャンネルの配列
           items:
-            $ref: '#/components/schemas/DMChannel'
+            $ref: "#/components/schemas/DMChannel"
       required:
         - public
     DMChannel:
@@ -6934,7 +7321,7 @@ components:
         - client_id
       properties:
         response_type:
-          $ref: '#/components/schemas/OAuth2ResponseType'
+          $ref: "#/components/schemas/OAuth2ResponseType"
         client_id:
           type: string
         redirect_uri:
@@ -6950,7 +7337,7 @@ components:
         nonce:
           type: string
         prompt:
-          $ref: '#/components/schemas/OAuth2Prompt'
+          $ref: "#/components/schemas/OAuth2Prompt"
     OAuth2Prompt:
       type: string
       enum:
@@ -7065,6 +7452,7 @@ components:
         - add_message_stamp
         - remove_message_stamp
         - get_my_stamp_history
+        - get_my_stamp_recommendations
         - get_stamp_palette
         - create_stamp_palette
         - edit_stamp_palette
@@ -7149,6 +7537,7 @@ components:
         - AddMessageStamp
         - RemoveMessageStamp
         - GetMyStampHistory
+        - GetMyStampRecommendations
         - GetStampPalette
         - CreateStampPalette
         - EditStampPalette
@@ -7227,7 +7616,7 @@ components:
           type: array
           description: セッションの配列
           items:
-            $ref: '#/components/schemas/Session'
+            $ref: "#/components/schemas/Session"
       required:
         - userId
         - channelId
@@ -7264,13 +7653,13 @@ components:
         images:
           type: array
           items:
-            $ref: '#/components/schemas/OgpMedia'
+            $ref: "#/components/schemas/OgpMedia"
         description:
           type: string
         videos:
           type: array
           items:
-            $ref: '#/components/schemas/OgpMedia'
+            $ref: "#/components/schemas/OgpMedia"
       required:
         - type
         - title
@@ -7348,11 +7737,11 @@ components:
         path:
           type: string
           description: チャンネルパス
-          pattern: '^(\/[a-zA-Z0-9-_]+)+$'
+          pattern: '^[a-zA-Z0-9-_]+(\/[a-zA-Z0-9-_]+)*$'
       required:
         - path
       example:
-        path: '/general'
+        path: "general/sub-channel"
     Session:
       type: object
       properties:
@@ -7365,6 +7754,195 @@ components:
       required:
         - state
         - sessionId
+    soundboardPlayResponse:
+      type: object
+      properties:
+        ingressId:
+          type: string
+          description: 作成された Ingress のID
+        url:
+          type: string
+          description: 作成された Ingress のストリームURL等
+        streamKey:
+          type: string
+          description: RTMP配信の場合のstream key
+      required:
+        - ingressId
+    qallEndpointResponse:
+      type: object
+      properties:
+        endpoint:
+          type: string
+          description: LiveKitのエンドポイント
+      required:
+        - endpoint
+    soundboardListResponse:
+      type: array
+      items:
+        $ref: "#/components/schemas/soundboardItem"
+    soundboardItem:
+      type: object
+      properties:
+        soundId:
+          type: string
+          description: サーバが発行したサウンドID
+        soundName:
+          type: string
+          description: ユーザが指定した表示用のサウンド名
+        stampId:
+          type: string
+          description: 任意のスタンプID等、サウンドに紐づく拡張情報
+        creatorId:
+          type: string
+          description: 作成者のユーザID
+      required:
+        - soundId
+        - soundName
+        - stampId
+        - creatorId
+    soundboardUploadResponse:
+      type: object
+      properties:
+        soundId:
+          type: string
+          description: 登録されたサウンドID (ファイル名)
+      required:
+        - soundId
+    qallRoomsListResponse:
+      type: array
+      items:
+        $ref: "#/components/schemas/qallRoomWithParticipants"
+    qallTokenResponse:
+      type: object
+      properties:
+        token:
+          type: string
+          description: LiveKit用のJWTトークン
+      required:
+        - token
+    qallRoomWithParticipants:
+      type: object
+      properties:
+        roomId:
+          type: string
+          format: uuid
+          description: ルームのID
+        participants:
+          type: array
+          items:
+            $ref: "#/components/schemas/qallParticipant"
+        isWebinar:
+          type: boolean
+          description: ウェビナールームかどうか
+        metadata:
+          type: string
+          description: ルームに関連付けられたカスタム属性
+      required:
+        - roomId
+        - participants
+    qallParticipant:
+      description: ルーム内の参加者一覧
+      type: object
+      properties:
+        identity:
+          type: string
+          description: ユーザーID_RandomUUID
+        name:
+          type: string
+          description: 表示名
+        joinedAt:
+          type: string
+          format: date-time
+          description: 参加した時刻
+        attributes:
+          type: object
+          additionalProperties:
+            type: string
+          description: ユーザーに関連付けられたカスタム属性
+        canPublish:
+          type: boolean
+          description: 発言権限
+    qallParticipantRequest:
+      type: object
+      properties:
+        users:
+          type: array
+          items:
+            type: object
+            properties:
+              userId:
+                type: string
+                description: ユーザーID
+              canPublish:
+                type: boolean
+                description: 発言権限
+      required:
+        - users
+    qallMetadataRequest:
+      type: object
+      properties:
+        metadata:
+          type: string
+          description: ルームに関連付けられたカスタム属性
+    qallMetadataResponse:
+      type: object
+      properties:
+        metadata:
+          type: string
+          description: ルームに関連付けられたカスタム属性
+    qallParticipantResponse:
+      type: object
+      properties:
+        results:
+          type: array
+          items:
+            type: object
+            properties:
+              participantId:
+                type: string
+                description: 対象参加者ID
+              status:
+                type: string
+                description: "success もしくは error"
+              errorMessage:
+                type: string
+                description: エラーがある場合の詳細
+      example:
+        results:
+          - participantId: "user1"
+            status: "success"
+          - participantId: "user2"
+            status: "error"
+            errorMessage: "Invalid participant ID"
+    soundboardUploadRequest:
+      type: object
+      properties:
+        audio:
+          type: string
+          format: binary
+          description: アップロードする音声ファイル(20秒以内)
+        soundName:
+          type: string
+          description: ユーザが自由につけるサウンド名
+        stampId:
+          type: string
+          description: アイコンスタンプID
+      required:
+        - audio
+        - soundName
+    soundboardPlayRequest:
+      type: object
+      properties:
+        soundId:
+          type: string
+          description: サウンドID (DB登録済み)
+        roomName:
+          type: string
+          format: uuid
+          description: 再生させたいルームのUUID
+      required:
+        - soundId
+        - roomName
   headers:
     X-TRAQ-MORE:
       schema:
@@ -7504,9 +8082,9 @@ components:
       schema:
         type: string
         format: date-time
-        default: '0000-01-01T00:00:00.000000Z'
+        default: "0000-01-01T00:00:00.000000Z"
       description: 取得する時間範囲の開始日時
-      example: '2016-10-12T11:00:00.000000Z'
+      example: "2016-10-12T11:00:00.000000Z"
     untilInQuery:
       in: query
       name: until
@@ -7514,7 +8092,7 @@ components:
         type: string
         format: date-time
       description: 取得する時間範囲の終了日時
-      example: '2016-10-12T11:00:00.0000000Z'
+      example: "2016-10-12T11:00:00.0000000Z"
     inclusiveInQuery:
       in: query
       name: inclusive
@@ -7540,6 +8118,36 @@ components:
       schema:
         type: string
         format: uuid
+    roomIdInPath:
+      name: roomId
+      in: path
+      required: true
+      description: ルームUUID
+      schema:
+        type: string
+        format: uuid
+    roomIdInQuery:
+      in: query
+      name: roomId
+      schema:
+        type: string
+        format: uuid
+      description: ルームUUID
+    isWebinarInQuery:
+      in: query
+      name: isWebinar
+      schema:
+        type: boolean
+      required: false
+      description: ウェビナールームかどうか(デフォルト false)
+    excludeDeletedMessagesInQuery:
+      in: query
+      name: exclude-deleted-messages
+      schema:
+        type: boolean
+      required: false
+      description: 削除されたメッセージを除外するかどうか(デフォルト false)
+
 tags:
   - name: user
     description: ユーザーAPI
@@ -7581,6 +8189,8 @@ tags:
     description: クリップAPI
   - name: ogp
     description: OGP API
+  - name: qall
+    description: Qall API
 security:
   - OAuth2: []
   - bearerAuth: []
