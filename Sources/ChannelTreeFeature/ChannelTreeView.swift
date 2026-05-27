@@ -1,18 +1,24 @@
 import Actuate
-import ChannelFeature
 import ChannelRepository
 import Model
 import SwiftUI
 
 package struct ChannelTreeView: View {
-    @State private var presentedChannel: ChannelPresentation?
+    @Binding private var selectedChannel: ChannelPresentation?
+    private let onChannelSelected: () -> Void
 
     private var loadChannels = EnvironmentAsyncAction(\.channelRepository, policy: .refresh) {
         (repository: any ChannelRepository, _: EmptyInput) in
         try await repository.fetchChannelTree()
     }
 
-    package init() {}
+    package init(
+        selectedChannel: Binding<ChannelPresentation?>,
+        onChannelSelected: @escaping () -> Void = {}
+    ) {
+        _selectedChannel = selectedChannel
+        self.onChannelSelected = onChannelSelected
+    }
 
     package var body: some View {
         Group {
@@ -46,33 +52,6 @@ package struct ChannelTreeView: View {
         .task {
             await loadChannels.run(input: EmptyInput())
         }
-        .fullScreenCover(item: $presentedChannel) { presentation in
-            ZStack {
-                Button(action: {
-                    presentedChannel = nil
-                }) {
-                    Text("")
-                        .frame(
-                            width: UIScreen.main.bounds.width,
-                            height: UIScreen.main.bounds.height
-                        )
-                }
-
-                ChannelView(
-                    channel: presentation.channel,
-                    channelPath: presentation.channelPath
-                )
-                .frame(
-                    width: UIScreen.main.bounds.width * 0.9,
-                    height: UIScreen.main.bounds.height * 0.8
-                )
-                .background(Color.white)
-                .clipShape(RoundedRectangle(cornerRadius: 16))
-                .compositingGroup()
-                .shadow(radius: 10)
-            }
-            .clearBackground()
-        }
     }
 
     @ViewBuilder
@@ -82,10 +61,11 @@ package struct ChannelTreeView: View {
                 name: channel.base.name,
                 hasChildren: channel.base.children.count > 0,
                 onNodeTapped: {
-                    presentedChannel = ChannelPresentation(
+                    selectedChannel = ChannelPresentation(
                         channel: channel.base,
                         channelPath: channel.path
                     )
+                    onChannelSelected()
                 }
             )
         }
@@ -94,6 +74,8 @@ package struct ChannelTreeView: View {
 }
 
 #Preview {
-    ChannelTreeView()
+    @Previewable @State var selectedChannel: ChannelPresentation?
+
+    ChannelTreeView(selectedChannel: $selectedChannel)
         .environment(\.channelRepository, PreviewChannelRepository())
 }

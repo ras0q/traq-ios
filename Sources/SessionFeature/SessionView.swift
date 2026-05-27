@@ -37,7 +37,6 @@ package struct SessionView<Content: View>: View {
                 loginForm
             }
         }
-        .padding()
         .task {
             await restoreSession()
         }

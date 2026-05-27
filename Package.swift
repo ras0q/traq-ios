@@ -91,6 +91,7 @@ let package = Package(
         .target(
             name: "Views",
             dependencies: [
+                "ChannelFeature",
                 "ChannelTreeFeature",
                 "ChannelRepository",
                 "MessageRepository",
