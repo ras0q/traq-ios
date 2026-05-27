@@ -49,7 +49,9 @@ package struct ChannelView: View {
             case .failure(let error, let previous):
                 VStack(spacing: 12) {
                     if let previous {
-                        ChannelMessageListView(messages: previous.messages, onClipMessage: clipMessage)
+                        ChannelMessageListView(
+                            messages: previous.messages, onClipMessage: clipMessage
+                        )
                     } else {
                         Spacer()
                     }
