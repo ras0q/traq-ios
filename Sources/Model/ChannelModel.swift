@@ -32,7 +32,7 @@ package struct ChannelRecursive: Identifiable, Equatable, Sendable {
     }
 }
 
-package struct ChannelPresentation: Identifiable, Equatable, Sendable {
+package struct ChannelPresentation: Identifiable, Equatable, Hashable, Sendable {
     package let channel: Components.Schemas.Channel
     package let channelPath: String
 

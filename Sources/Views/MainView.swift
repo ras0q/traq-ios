@@ -8,21 +8,50 @@ import SessionRepository
 import SwiftUI
 
 public struct MainView: View {
+    @Environment(\.horizontalSizeClass) private var horizontalSizeClass
     @State private var catalog = TraqCatalog()
     @State private var selectedChannel: ChannelPresentation?
-    @State private var preferredCompactColumn = NavigationSplitViewColumn.detail
 
     public init() {}
 
     public var body: some View {
         SessionView {
-            NavigationSplitView(preferredCompactColumn: $preferredCompactColumn) {
-                ChannelTreeView(
-                    selectedChannel: $selectedChannel,
-                    onChannelSelected: { preferredCompactColumn = .detail }
-                )
+            Group {
+                if horizontalSizeClass == .compact {
+                    compactNavigation
+                } else {
+                    splitNavigation
+                }
+            }
+        }
+        .environment(catalog)
+        .environment(\.sessionRepository, LiveSessionRepository())
+        .environment(\.channelRepository, LiveChannelRepository())
+        .environment(\.messageRepository, LiveMessageRepository())
+    }
+
+    private var compactNavigation: some View {
+        NavigationStack {
+            ChannelTreeView(selectedChannel: $selectedChannel)
                 .navigationTitle("Channels")
-            } detail: {
+                .navigationDestination(item: $selectedChannel) { presentation in
+                    ChannelView(
+                        channel: presentation.channel,
+                        channelPath: presentation.channelPath
+                    )
+                }
+                .toolbar { AccountToolbarContent() }
+        }
+    }
+
+    private var splitNavigation: some View {
+        NavigationSplitView {
+            NavigationStack {
+                ChannelTreeView(selectedChannel: $selectedChannel)
+                    .navigationTitle("Channels")
+            }
+        } detail: {
+            NavigationStack {
                 if let selectedChannel {
                     ChannelView(
                         channel: selectedChannel.channel,
@@ -36,11 +65,8 @@ public struct MainView: View {
                     )
                 }
             }
+            .toolbar { AccountToolbarContent() }
         }
-        .environment(catalog)
-        .environment(\.sessionRepository, LiveSessionRepository())
-        .environment(\.channelRepository, LiveChannelRepository())
-        .environment(\.messageRepository, LiveMessageRepository())
     }
 }
 

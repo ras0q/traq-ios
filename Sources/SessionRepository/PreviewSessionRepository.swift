@@ -1,5 +1,6 @@
 import Foundation
 import Model
+import TraqAPI
 
 package struct PreviewSessionRepository: SessionRepository {
     private let isLoggedIn: Bool
@@ -23,5 +24,23 @@ package struct PreviewSessionRepository: SessionRepository {
     package func fetchCatalog() async throws -> CatalogData {
         try await Task.sleep(for: .milliseconds(200))
         return CatalogData(users: [], stamps: [])
+    }
+
+    package func fetchMe() async throws -> Components.Schemas.MyUserDetail {
+        try await Task.sleep(for: .milliseconds(200))
+        return Components.Schemas.MyUserDetail(
+            id: "00000000-0000-4000-8000-000000000001",
+            bio: "",
+            groups: [],
+            tags: [],
+            updatedAt: .now,
+            twitterId: "preview",
+            name: "preview",
+            displayName: "Preview User",
+            iconFileId: "00000000-0000-4000-8000-000000000002",
+            bot: false,
+            state: ._0,
+            permissions: []
+        )
     }
 }

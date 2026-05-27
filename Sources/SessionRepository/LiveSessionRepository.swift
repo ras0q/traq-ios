@@ -31,6 +31,16 @@ package struct LiveSessionRepository: SessionRepository {
         }
     }
 
+    package func fetchMe() async throws -> Components.Schemas.MyUserDetail {
+        let response = try await client.getMe()
+        switch response {
+        case .ok(let ok):
+            return try ok.body.json
+        default:
+            throw RepositoryError.unexpectedResponse
+        }
+    }
+
     package func fetchCatalog() async throws -> CatalogData {
         async let usersResponse = client.getUsers(
             .init(query: .init(include_hyphen_suspended: true)))

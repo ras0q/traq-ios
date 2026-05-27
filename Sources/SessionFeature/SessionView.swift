@@ -23,6 +23,11 @@ package struct SessionView<Content: View>: View {
         try await repository.fetchCatalog()
     }
 
+    private var fetchMe = EnvironmentAsyncAction(\.sessionRepository) {
+        (repository: any SessionRepository, _: EmptyInput) in
+        try await repository.fetchMe()
+    }
+
     private let contentView: () -> Content
 
     package init(contentView: @escaping () -> Content) {
@@ -94,11 +99,15 @@ package struct SessionView<Content: View>: View {
 
     private func bootstrapCatalog() async {
         await loadCatalog.run(input: EmptyInput())
-        guard case .success(let catalogData) = loadCatalog.phase else {
+        await fetchMe.run(input: EmptyInput())
+        guard case .success(let catalogData) = loadCatalog.phase,
+            case .success(let currentUser) = fetchMe.phase
+        else {
             return
         }
         catalog.users = catalogData.users
         catalog.stamps = catalogData.stamps
+        catalog.currentUser = currentUser
         isLoggedIn = true
     }
 }
