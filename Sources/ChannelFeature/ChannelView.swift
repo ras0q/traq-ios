@@ -1,141 +1,91 @@
-import ComposableArchitecture
+import Actuate
 import MarkdownFeature
+import MessageRepository
+import Model
 import SwiftUI
 import TraqAPI
 
-@Reducer
-package struct Channel {
-    @ObservableState
-    package struct State: Equatable {
-        let channel: Components.Schemas.Channel
-        let channelPath: String
-        var messages: [Components.Schemas.Message] = []
-        @Shared(.inMemory("users"))
-        package var users: [Components.Schemas.User] = []
-        @Shared(.inMemory("stamps"))
-        package var stamps: [Components.Schemas.StampWithThumbnail] = []
-        @Shared(.inMemory("clipFolderId"))
-        package var clipFolderId: String? = nil
-
-        package init(channel: Components.Schemas.Channel, channelPath: String) {
-            self.channel = channel
-            self.channelPath = channelPath
-        }
-    }
-
-    package enum Action: ViewAction {
-        case view(ViewAction)
-        case `internal`(InternalAction)
-
-        package enum ViewAction {
-            case appeared
-            case messageClipped(messageId: String)
-        }
-
-        package enum InternalAction {
-            case getMessagesResponse(Operations.getMessages.Output)
-            case getClipFoldersResponse(Operations.getClipFolders.Output)
-            case clipMessageResponse(Operations.clipMessage.Output)
-        }
-    }
-
-    package init() {}
-
-    package var body: some ReducerOf<Self> {
-        Reduce {
-            state,
-            action in
-            switch action {
-            case .view(let viewAction):
-                switch viewAction {
-                case .appeared:
-                    return .run {
-                        [channel = state.channel, clipFolderId = state.clipFolderId] send in
-                        let response = try await traqAPIClient.getMessages(
-                            path: .init(channelId: channel.id),
-                            query: .init(order: .desc)
-                        )
-                        await send(.internal(.getMessagesResponse(response)))
-
-                        if clipFolderId == nil {
-                            let response = try await traqAPIClient.getClipFolders()
-                            await send(.internal(.getClipFoldersResponse(response)))
-                        }
-                    }
-                case .messageClipped(let messageId):
-                    guard let clipFolderId = state.clipFolderId else {
-                        print("clipFolderId not specified")
-                        return .none
-                    }
-                    return .run { send in
-                        let response = try await traqAPIClient.clipMessage(
-                            path: .init(folderId: clipFolderId),
-                            body: .json(.init(messageId: messageId))
-                        )
-                        await send(.internal(.clipMessageResponse(response)))
-                    }
-                }
-            case .internal(let internalAction):
-                switch internalAction {
-                case .getMessagesResponse(let response):
-                    switch response {
-                    case .ok(let okResponse):
-                        do {
-                            state.messages = try okResponse.body.json
-                                .sorted { $0.createdAt < $1.createdAt }
-                        } catch {
-                            print(error)
-                        }
-                    default:
-                        print(response)
-                    }
-                case .getClipFoldersResponse(let response):
-                    switch response {
-                    case .ok(let okResponse):
-                        do {
-                            state.clipFolderId = try okResponse.body.json.first?.id
-                        } catch {
-                            print(error)
-                        }
-                    default:
-                        print(response)
-                    }
-                case .clipMessageResponse(let response):
-                    switch response {
-                    case .ok:
-                        return .none
-                    default:
-                        print(response)
-                    }
-                }
-                return .none
-            }
-        }
-    }
-}
-
-@ViewAction(for: Channel.self)
 package struct ChannelView: View {
-    package let store: StoreOf<Channel>
+    @Environment(TraqCatalog.self) private var catalog
 
-    package init(store: StoreOf<Channel>) {
-        self.store = store
+    private let channel: Components.Schemas.Channel
+    private let channelPath: String
+
+    private var loadChannel = EnvironmentAsyncAction(\.messageRepository, policy: .refresh) {
+        repository, input in
+        try await repository.loadChannel(input)
+    }
+
+    private var clipMessageAction = EnvironmentAsyncAction(\.messageRepository) {
+        repository, input in
+        try await repository.clipMessage(input)
+    }
+
+    package init(channel: Components.Schemas.Channel, channelPath: String) {
+        self.channel = channel
+        self.channelPath = channelPath
+    }
+
+    private var loadChannelInput: LoadChannelInput {
+        LoadChannelInput(
+            channelId: channel.id,
+            loadClipFolder: catalog.clipFolderId == nil
+        )
     }
 
     package var body: some View {
         VStack(alignment: .leading) {
-            Text(store.channelPath.replacing("/", maxReplacements: 1, with: { _ in "#" }))
+            Text(channelPath.replacing("/", maxReplacements: 1, with: { _ in "#" }))
                 .font(.title)
                 .bold()
-            List(store.messages, id: \.id) { message in
+
+            switch loadChannel.phase {
+            case .idle, .loading(nil):
+                ProgressView()
+                    .frame(maxWidth: .infinity, maxHeight: .infinity)
+            case .loading(let previous?):
+                messageList(previous.messages)
+            case .success(let output):
+                messageList(output.messages)
+            case .failure(let error, let previous):
+                VStack(spacing: 12) {
+                    if let previous {
+                        messageList(previous.messages)
+                    } else {
+                        Spacer()
+                    }
+                    Text(error.localizedDescription)
+                        .foregroundStyle(.red)
+                        .font(.callout)
+                    Button("Retry") {
+                        Task {
+                            await reloadChannel(force: true)
+                        }
+                    }
+                    Spacer()
+                }
+            }
+        }
+        .padding()
+        .task(id: loadChannelInput) {
+            await reloadChannel()
+        }
+    }
+
+    @ViewBuilder
+    private func messageList(_ messages: [Components.Schemas.Message]) -> some View {
+        List(messages, id: \.id) { message in
+            if let user = catalog.users.first(where: { $0.id == message.userId }) {
                 ChannelMessageView(
                     message: message,
-                    user: store.users.first(where: { $0.id == message.userId })!,
-                    stamps: store.stamps
+                    user: user,
+                    stamps: catalog.stamps
                 )
                 .swipeActions(edge: .leading, allowsFullSwipe: true) {
                     Button {
-                        send(.messageClipped(messageId: message.id))
+                        Task {
+                            await clipMessage(messageId: message.id)
+                        }
                     } label: {
                         Label("クリップ", systemImage: "bookmark.fill")
                     }
@@ -151,12 +101,27 @@ package struct ChannelView: View {
                     .tint(.blue)
                 }
             }
-            .listStyle(.inset)
-            Spacer()
         }
-        .padding()
-        .onAppear {
-            send(.appeared)
+        .listStyle(.inset)
+        Spacer()
+    }
+
+    private func reloadChannel(force: Bool = false) async {
+        await loadChannel.run(input: loadChannelInput, force: force)
+        guard case .success(let output) = loadChannel.phase else {
+            return
         }
+        if let clipFolderId = output.clipFolderId {
+            catalog.clipFolderId = clipFolderId
+        }
+    }
+
+    private func clipMessage(messageId: String) async {
+        guard let clipFolderId = catalog.clipFolderId else {
+            return
+        }
+        await clipMessageAction.run(
+            input: ClipMessageInput(folderId: clipFolderId, messageId: messageId)
+        )
     }
 }

@@ -1,25 +1,27 @@
+import ChannelRepository
 import ChannelTreeFeature
+import MessageRepository
+import Model
 import SessionFeature
+import SessionRepository
 import SwiftUI
 
 public struct MainView: View {
+    @State private var catalog = TraqCatalog()
+
     public init() {}
 
     public var body: some View {
-        SessionView(
-            store: .init(initialState: Session.State()) {
-                Session()
-            }
-        ) {
+        SessionView {
             NavigationStack {
-                ChannelTreeView(
-                    store: .init(initialState: ChannelTree.State()) {
-                        ChannelTree()
-                    }
-                )
-                .navigationTitle("Channels")
+                ChannelTreeView()
+                    .navigationTitle("Channels")
             }
         }
+        .environment(catalog)
+        .environment(\.sessionRepository, LiveSessionRepository())
+        .environment(\.channelRepository, LiveChannelRepository())
+        .environment(\.messageRepository, LiveMessageRepository())
     }
 }
 

@@ -1,4 +1,3 @@
-import ComposableArchitecture
 import MarkdownFeature
 import SwiftUI
 import TraqAPI
@@ -10,7 +9,8 @@ struct ChannelMessageView: View {
     let messageStampsGroupby: [String: [Components.Schemas.MessageStamp]]
 
     init(
-        message: Components.Schemas.Message, user: Components.Schemas.User,
+        message: Components.Schemas.Message,
+        user: Components.Schemas.User,
         stamps: [Components.Schemas.StampWithThumbnail]
     ) {
         self.message = message

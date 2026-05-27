@@ -1,161 +1,73 @@
-import ComposableArchitecture
+import Actuate
+import Model
+import SessionRepository
 import SwiftUI
-import TraqAPI
 
-extension Components.Schemas.User: Identifiable {}
-
-package struct Session: Reducer {
-    @ObservableState
-    package struct State {
-        var isLogined: Bool = false
-        @Shared(.inMemory("users"))
-        package var users: [Components.Schemas.User] = []
-        @Shared(.inMemory("stamps"))
-        package var stamps: [Components.Schemas.StampWithThumbnail] = []
-
-        package init(isLogined: Bool = false) {
-            self.isLogined = isLogined
-        }
-    }
-
-    package enum Action: ViewAction {
-        case view(ViewAction)
-        case `internal`(InternalAction)
-
-        package enum ViewAction {
-            case onAppear
-            case loginButtonTapped(name: String, password: String)
-        }
-
-        package enum InternalAction {
-            case getMeResponse(Operations.getMe.Output)
-            case getUsersResponse(Operations.getUsers.Output)
-            case getStampsResponse(Operations.getStamps.Output)
-            case loginResponse(Operations.login.Output)
-        }
-    }
-
-    package init() {}
-
-    package var body: some ReducerOf<Self> {
-        Reduce { state, action in
-            switch action {
-            case .view(let viewAction):
-                switch viewAction {
-                case .onAppear:
-                    return .run { send in
-                        let getMeResponse = try await traqAPIClient.getMe()
-                        await send(.internal(.getMeResponse(getMeResponse)))
-                    }
-                case .loginButtonTapped(let name, let password):
-                    return .run { send in
-                        let response = try await traqAPIClient.login(
-                            body: .some(.json(.init(name: name, password: password)))
-                        )
-                        await send(.internal(.loginResponse(response)))
-                    }
-                }
-            case .internal(let internalAction):
-                switch internalAction {
-                case .getMeResponse(let response):
-                    switch response {
-                    case .ok:
-                        state.isLogined = true
-                        return .merge(
-                            .run { send in
-                                let getUsersResponse = try await traqAPIClient.getUsers(
-                                    .init(query: .init(include_hyphen_suspended: true))
-                                )
-                                await send(.internal(.getUsersResponse(getUsersResponse)))
-                            },
-                            .run { send in
-                                let getStampsResponse = try await traqAPIClient.getStamps()
-                                await send(.internal(.getStampsResponse(getStampsResponse)))
-                            }
-                        )
-                    default:
-                        state.isLogined = false
-                        print(response)
-                    }
-                case .getUsersResponse(let response):
-                    switch response {
-                    case .ok(let okResponse):
-                        do {
-                            let newUsers = try okResponse.body.json
-                            state.$users.withLock {
-                                $0 = newUsers
-                            }
-                        } catch {
-                            print(error)
-                        }
-                    default:
-                        print(response)
-                    }
-                case .getStampsResponse(let response):
-                    switch response {
-                    case .ok(let okResponse):
-                        do {
-                            let newStamps = try okResponse.body.json
-                            state.$stamps.withLock {
-                                $0 = newStamps
-                            }
-                        } catch {
-                            print(error)
-                        }
-                    default:
-                        print(response)
-                    }
-                case .loginResponse(let response):
-                    switch response {
-                    case .noContent:
-                        state.isLogined = true
-                    default:
-                        state.isLogined = false
-                        print(response)
-                    }
-                }
-                return .none
-            }
-        }
-    }
-}
-
-@ViewAction(for: Session.self)
 package struct SessionView<Content: View>: View {
+    @Environment(TraqCatalog.self) private var catalog
     @State private var id: String = ""
     @State private var password: String = ""
-    package let store: StoreOf<Session>
+    @State private var isLoggedIn = false
+
+    private var checkSession = EnvironmentAsyncAction(\.sessionRepository) {
+        (repository: any SessionRepository, _: EmptyInput) in
+        try await repository.checkSession()
+    }
+
+    private var login = EnvironmentAsyncAction(\.sessionRepository) { repository, input in
+        try await repository.login(input)
+    }
+
+    private var loadCatalog = EnvironmentAsyncAction(\.sessionRepository) {
+        (repository: any SessionRepository, _: EmptyInput) in
+        try await repository.fetchCatalog()
+    }
+
     private let contentView: () -> Content
 
-    package init(store: StoreOf<Session>, contentView: @escaping () -> Content) {
-        self.store = store
+    package init(contentView: @escaping () -> Content) {
         self.contentView = contentView
     }
 
     package var body: some View {
         VStack(alignment: .center, spacing: 16) {
-            if store.isLogined {
+            if isLoggedIn {
                 contentView()
             } else {
-                TextField("ID", text: $id)
-                    .keyboardType(.asciiCapable)
-                    .autocorrectionDisabled()
-                    .textInputAutocapitalization(.never)
-                    .padding()
-                    .overlay { borderStyle }
-                SecureField("Password", text: $password)
-                    .keyboardType(.asciiCapable)
-                    .padding()
-                    .overlay { borderStyle }
-                Button("ログイン") {
-                    send(.loginButtonTapped(name: id, password: password))
-                }
-                .buttonStyle(.borderedProminent)
+                loginForm
             }
         }
         .padding()
-        .onAppear {
-            send(.onAppear)
+        .task {
+            await restoreSession()
+        }
+    }
+
+    private var loginForm: some View {
+        Group {
+            TextField("ID", text: $id)
+                .keyboardType(.asciiCapable)
+                .autocorrectionDisabled()
+                .textInputAutocapitalization(.never)
+                .padding()
+                .overlay { borderStyle }
+            SecureField("Password", text: $password)
+                .keyboardType(.asciiCapable)
+                .padding()
+                .overlay { borderStyle }
+            Button("ログイン") {
+                Task {
+                    await performLogin()
+                }
+            }
+            .buttonStyle(.borderedProminent)
+            .disabled(login.phase.isLoading)
+
+            if case .failure(let error, _) = login.phase {
+                Text(error.localizedDescription)
+                    .foregroundStyle(.red)
+                    .font(.callout)
+            }
         }
     }
 
@@ -163,15 +75,39 @@ package struct SessionView<Content: View>: View {
         RoundedRectangle(cornerRadius: 16)
             .stroke(.primary, lineWidth: 1)
     }
+
+    private func restoreSession() async {
+        await checkSession.run(input: EmptyInput())
+        guard case .success(let loggedIn) = checkSession.phase, loggedIn else {
+            return
+        }
+        await bootstrapCatalog()
+    }
+
+    private func performLogin() async {
+        let input = LoginInput(name: id, password: password)
+        await login.run(input: input)
+        guard case .success = login.phase else {
+            return
+        }
+        await bootstrapCatalog()
+    }
+
+    private func bootstrapCatalog() async {
+        await loadCatalog.run(input: EmptyInput())
+        guard case .success(let catalogData) = loadCatalog.phase else {
+            return
+        }
+        catalog.users = catalogData.users
+        catalog.stamps = catalogData.stamps
+        isLoggedIn = true
+    }
 }
 
 #Preview {
-    SessionView(
-        store: .init(initialState: Session.State()) {
-            Session()
-                ._printChanges()
-        }
-    ) {
+    SessionView {
         Text("Login succeeded!")
     }
+    .environment(\.sessionRepository, PreviewSessionRepository(isLoggedIn: true))
+    .environment(TraqCatalog())
 }
