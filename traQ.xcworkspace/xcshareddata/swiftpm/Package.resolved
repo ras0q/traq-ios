@@ -1,5 +1,5 @@
 {
-  "originHash" : "bdecf9e044e4d4ceea98316d50088f0791f847e66ff77002e0ae1a9fed0bdfbf",
+  "originHash" : "2532a2436cde169be3b361eb81c4043f87b905d10d965a602f498741a6a22c5c",
   "pins" : [
     {
       "identity" : "actuate",
@@ -7,7 +7,7 @@
       "location" : "https://github.com/ras0q/actuate",
       "state" : {
         "branch" : "main",
-        "revision" : "ca4711d4362ad884568d7e4adbd2206f56ab0f32"
+        "revision" : "b22130e5182d3375b7be5cc806899fe36df22838"
       }
     },
     {
