@@ -27,11 +27,6 @@ swift format -ir .
 swift format lint -r .
 ```
 
-### Do not build
-
-- Do **not** run `xcodebuild`, `swift build`, or `swift test` as part of routine agent work.
-- Full builds are slow and environment-dependent; leave them to the user or CI.
-
 ## Code Artifacts
 
 - **Explain why, not what**: Comment only non-obvious decisions; never restate the code.
