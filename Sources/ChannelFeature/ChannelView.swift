@@ -1,5 +1,4 @@
 import Actuate
-import MarkdownFeature
 import MessageRepository
 import Model
 import SwiftUI
@@ -44,13 +43,13 @@ package struct ChannelView: View {
                 ProgressView()
                     .frame(maxWidth: .infinity, maxHeight: .infinity)
             case .loading(let previous?):
-                messageList(previous.messages)
+                ChannelMessageListView(messages: previous.messages, onClipMessage: clipMessage)
             case .success(let output):
-                messageList(output.messages)
+                ChannelMessageListView(messages: output.messages, onClipMessage: clipMessage)
             case .failure(let error, let previous):
                 VStack(spacing: 12) {
                     if let previous {
-                        messageList(previous.messages)
+                        ChannelMessageListView(messages: previous.messages, onClipMessage: clipMessage)
                     } else {
                         Spacer()
                     }
@@ -73,40 +72,6 @@ package struct ChannelView: View {
         }
     }
 
-    @ViewBuilder
-    private func messageList(_ messages: [Components.Schemas.Message]) -> some View {
-        List(messages, id: \.id) { message in
-            if let user = catalog.users.first(where: { $0.id == message.userId }) {
-                ChannelMessageView(
-                    message: message,
-                    user: user,
-                    stamps: catalog.stamps
-                )
-                .swipeActions(edge: .leading, allowsFullSwipe: true) {
-                    Button {
-                        Task {
-                            await clipMessage(messageId: message.id)
-                        }
-                    } label: {
-                        Label("クリップ", systemImage: "bookmark.fill")
-                    }
-                    .tint(.green)
-                }
-                .swipeActions(edge: .trailing, allowsFullSwipe: true) {
-                    Button {
-                        UIPasteboard.general.string =
-                            "https://\(traqServerURL.host()!)/messages/\(message.id)"
-                    } label: {
-                        Label("リンクをコピー", systemImage: "link")
-                    }
-                    .tint(.blue)
-                }
-            }
-        }
-        .listStyle(.inset)
-        Spacer()
-    }
-
     private func reloadChannel(force: Bool = false) async {
         await loadChannel.run(input: loadChannelInput, force: force)
         guard case .success(let output) = loadChannel.phase else {
@@ -117,7 +82,7 @@ package struct ChannelView: View {
         }
     }
 
-    private func clipMessage(messageId: String) async {
+    private func clipMessage(_ messageId: String) async {
         guard let clipFolderId = catalog.clipFolderId else {
             return
         }
