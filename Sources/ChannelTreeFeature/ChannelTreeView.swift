@@ -67,37 +67,39 @@ package struct ChannelTree {
     package var body: some ReducerOf<Self> {
         Reduce { state, action in
             switch action {
-            case let .view(viewAction):
+            case .view(let viewAction):
                 switch viewAction {
                 case .appeared:
                     state.isLoading = true
                     return .run { send in
-                        let response = try await traqAPIClient.getChannels(query: .init(include_hyphen_dm: false))
+                        let response = try await traqAPIClient.getChannels(
+                            query: .init(include_hyphen_dm: false))
                         await send(.internal(.getChannelsResponse(response)))
                     }
-                case let .nodeTapped(channel: channel, channelPath: channelPath):
+                case .nodeTapped(let channel, let channelPath):
                     state.destination = Channel.State(channel: channel, channelPath: channelPath)
                 case .nodeDismissed:
                     state.destination = nil
                 }
                 return .none
-            case let .internal(internalAction):
+            case .internal(let internalAction):
                 switch internalAction {
-                case let .getChannelsResponse(response):
+                case .getChannelsResponse(let response):
                     state.isLoading = false
                     switch response {
-                    case let .ok(ok):
+                    case .ok(let ok):
                         return .run { send in
                             let publicChannels = try ok.body.json._public
                                 .filter { !$0.archived }
                                 .sorted { $0.name.lowercased() < $1.name.lowercased() }
-                            let rootChannels = ChannelRecursive(channels: publicChannels)?.children ?? []
+                            let rootChannels =
+                                ChannelRecursive(channels: publicChannels)?.children ?? []
                             await send(.internal(.channelTreeConstructed(rootChannels)))
                         }
                     default:
                         print(response)
                     }
-                case let .channelTreeConstructed(rootChannels):
+                case .channelTreeConstructed(let rootChannels):
                     state.rootChannels = rootChannels
                 }
                 return .none
@@ -139,10 +141,10 @@ package struct ChannelTreeView: View {
                     send(.nodeDismissed)
                 }) {
                     Text("")
-                    .frame(
-                        width: UIScreen.main.bounds.width,
-                        height: UIScreen.main.bounds.height
-                    )
+                        .frame(
+                            width: UIScreen.main.bounds.width,
+                            height: UIScreen.main.bounds.height
+                        )
                 }
 
                 ChannelView(store: store)

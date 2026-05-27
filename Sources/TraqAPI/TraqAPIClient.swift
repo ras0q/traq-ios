@@ -19,7 +19,6 @@ package let traqAPIClient = Client(
     transport: URLSessionTransport()
 )
 
-
 struct CustomDateTranscoder: DateTranscoder {
     let dateFormatter: DateFormatter
     let dateFormatterWithFractional: DateFormatter

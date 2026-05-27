@@ -22,7 +22,7 @@ package struct URLImage: View {
         } else {
             AsyncImage(url: url) { phase in
                 switch phase {
-                case let .success(image):
+                case .success(let image):
                     image.resizable().task(id: url) {
                         URLImage.imageCache[url] = image
                     }

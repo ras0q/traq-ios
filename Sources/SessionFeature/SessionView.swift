@@ -40,14 +40,14 @@ package struct Session: Reducer {
     package var body: some ReducerOf<Self> {
         Reduce { state, action in
             switch action {
-            case let .view(viewAction):
+            case .view(let viewAction):
                 switch viewAction {
                 case .onAppear:
                     return .run { send in
                         let getMeResponse = try await traqAPIClient.getMe()
                         await send(.internal(.getMeResponse(getMeResponse)))
                     }
-                case let .loginButtonTapped(name: name, password: password):
+                case .loginButtonTapped(let name, let password):
                     return .run { send in
                         let response = try await traqAPIClient.login(
                             body: .some(.json(.init(name: name, password: password)))
@@ -55,9 +55,9 @@ package struct Session: Reducer {
                         await send(.internal(.loginResponse(response)))
                     }
                 }
-            case let .internal(internalAction):
+            case .internal(let internalAction):
                 switch internalAction {
-                case let .getMeResponse(response):
+                case .getMeResponse(let response):
                     switch response {
                     case .ok:
                         state.isLogined = true
@@ -77,9 +77,9 @@ package struct Session: Reducer {
                         state.isLogined = false
                         print(response)
                     }
-                case let .getUsersResponse(response):
+                case .getUsersResponse(let response):
                     switch response {
-                    case let .ok(okResponse):
+                    case .ok(let okResponse):
                         do {
                             let newUsers = try okResponse.body.json
                             state.$users.withLock {
@@ -91,9 +91,9 @@ package struct Session: Reducer {
                     default:
                         print(response)
                     }
-                case let .getStampsResponse(response):
+                case .getStampsResponse(let response):
                     switch response {
-                    case let .ok(okResponse):
+                    case .ok(let okResponse):
                         do {
                             let newStamps = try okResponse.body.json
                             state.$stamps.withLock {
@@ -105,7 +105,7 @@ package struct Session: Reducer {
                     default:
                         print(response)
                     }
-                case let .loginResponse(response):
+                case .loginResponse(let response):
                     switch response {
                     case .noContent:
                         state.isLogined = true

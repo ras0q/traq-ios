@@ -46,10 +46,11 @@ package struct Channel {
             state,
             action in
             switch action {
-            case let .view(viewAction):
+            case .view(let viewAction):
                 switch viewAction {
                 case .appeared:
-                    return .run { [channel = state.channel, clipFolderId = state.clipFolderId] send in
+                    return .run {
+                        [channel = state.channel, clipFolderId = state.clipFolderId] send in
                         let response = try await traqAPIClient.getMessages(
                             path: .init(channelId: channel.id),
                             query: .init(order: .desc)
@@ -61,7 +62,7 @@ package struct Channel {
                             await send(.internal(.getClipFoldersResponse(response)))
                         }
                     }
-                case let .messageClipped(messageId: messageId):
+                case .messageClipped(let messageId):
                     guard let clipFolderId = state.clipFolderId else {
                         print("clipFolderId not specified")
                         return .none
@@ -74,11 +75,11 @@ package struct Channel {
                         await send(.internal(.clipMessageResponse(response)))
                     }
                 }
-            case let .internal(internalAction):
+            case .internal(let internalAction):
                 switch internalAction {
-                case let .getMessagesResponse(response):
+                case .getMessagesResponse(let response):
                     switch response {
-                    case let .ok(okResponse):
+                    case .ok(let okResponse):
                         do {
                             state.messages = try okResponse.body.json
                                 .sorted { $0.createdAt < $1.createdAt }
@@ -88,9 +89,9 @@ package struct Channel {
                     default:
                         print(response)
                     }
-                case let .getClipFoldersResponse(response):
+                case .getClipFoldersResponse(let response):
                     switch response {
-                    case let .ok(okResponse):
+                    case .ok(let okResponse):
                         do {
                             state.clipFolderId = try okResponse.body.json.first?.id
                         } catch {
@@ -99,7 +100,7 @@ package struct Channel {
                     default:
                         print(response)
                     }
-                case let .clipMessageResponse(response):
+                case .clipMessageResponse(let response):
                     switch response {
                     case .ok:
                         return .none
@@ -142,7 +143,8 @@ package struct ChannelView: View {
                 }
                 .swipeActions(edge: .trailing, allowsFullSwipe: true) {
                     Button {
-                        UIPasteboard.general.string = "https://\(traqServerURL.host()!)/messages/\(message.id)"
+                        UIPasteboard.general.string =
+                            "https://\(traqServerURL.host()!)/messages/\(message.id)"
                     } label: {
                         Label("リンクをコピー", systemImage: "link")
                     }

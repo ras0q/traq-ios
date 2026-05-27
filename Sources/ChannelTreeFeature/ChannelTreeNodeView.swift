@@ -21,7 +21,7 @@ struct ChannelTreeNodeView: View {
                 Text(name)
                 Spacer()
             }
-            .contentShape(Rectangle()) // Spacerにも判定をつける
+            .contentShape(Rectangle())  // Spacerにも判定をつける
             .onTapGesture {
                 onNodeTapped()
             }
@@ -48,10 +48,11 @@ struct ChannelTreeNodeView: View {
 }
 
 #Preview {
-    ForEach(0 ..< 5) { index in
+    ForEach(0..<5) { index in
         ChannelTreeNodeView(
-            name: "channel\(index)", hasChildren: Bool.random()) {
-                print("channel\(index) tapped")
-            }
+            name: "channel\(index)", hasChildren: Bool.random()
+        ) {
+            print("channel\(index) tapped")
+        }
     }
 }

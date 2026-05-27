@@ -12,7 +12,7 @@ extension Components.Schemas.Channel {
             force: Bool.random(),
             topic: "topic",
             name: "name\(index)",
-            children: (0 ..< 3).map { UUID(3 * index + $0).uuidString }
+            children: (0..<3).map { UUID(3 * index + $0).uuidString }
         )
     }
 }

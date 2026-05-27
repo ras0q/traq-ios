@@ -12,11 +12,12 @@ let package = Package(
         .library(name: "MarkdownFeature", targets: ["MarkdownFeature"]),
         .library(name: "SessionFeature", targets: ["SessionFeature"]),
         .library(name: "TraqAPI", targets: ["TraqAPI"]),
-        .library(name: "Views", targets: ["Views"])
+        .library(name: "Views", targets: ["Views"]),
     ],
     dependencies: [
         .package(url: "https://github.com/gonzalezreal/swift-markdown-ui", from: "2.4.1"),
-        .package(url: "https://github.com/pointfreeco/swift-composable-architecture", from: "1.25.0"),
+        .package(
+            url: "https://github.com/pointfreeco/swift-composable-architecture", from: "1.25.0"),
         .package(url: "https://github.com/apple/swift-openapi-generator", from: "1.12.1"),
         .package(url: "https://github.com/apple/swift-openapi-runtime", from: "1.11.0"),
         .package(url: "https://github.com/apple/swift-openapi-urlsession", from: "1.3.0"),
@@ -59,7 +60,7 @@ let package = Package(
                 .product(name: "OpenAPIURLSession", package: "swift-openapi-urlsession"),
             ],
             plugins: [
-                .plugin(name: "OpenAPIGenerator", package: "swift-openapi-generator"),
+                .plugin(name: "OpenAPIGenerator", package: "swift-openapi-generator")
             ]
         ),
         .target(
