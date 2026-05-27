@@ -33,12 +33,12 @@ package struct ChannelView: View {
         )
     }
 
+    private var channelTitle: String {
+        channelPath.replacing("/", maxReplacements: 1, with: { _ in "#" })
+    }
+
     package var body: some View {
         VStack(alignment: .leading) {
-            Text(channelPath.replacing("/", maxReplacements: 1, with: { _ in "#" }))
-                .font(.title)
-                .bold()
-
             switch loadChannel.phase {
             case .idle, .loading(nil):
                 ProgressView()
@@ -66,7 +66,8 @@ package struct ChannelView: View {
                 }
             }
         }
-        .padding()
+        .navigationTitle(channelTitle)
+        .navigationBarTitleDisplayMode(.inline)
         .task(id: loadChannelInput) {
             await reloadChannel()
         }
